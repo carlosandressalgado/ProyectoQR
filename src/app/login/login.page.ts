@@ -31,7 +31,7 @@ export class LoginPage implements OnInit {
 
   ngOnInit() {
   }
-  //Validar usuario en localstorage e ingresar
+  //Buscar y Validar usuario en localstorage e ingresar
   async ingresar(){
     var f = this.formularioLogin.value;
 

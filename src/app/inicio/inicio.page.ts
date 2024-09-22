@@ -16,7 +16,7 @@ export class InicioPage implements OnInit {
     const usuarioJSON = localStorage.getItem('usuario');
     const usuario = usuarioJSON !== null ? JSON.parse(usuarioJSON) : null;
 
-    // Si el usuario existe tomamos su nombre
+    // Si el usuario existe guardamos su nombre
     if (usuario && usuario.nombre) {
       this.nombreUsuario = usuario.nombre;
     }

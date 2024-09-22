@@ -55,7 +55,7 @@ export class RestablecerContrasenaPage implements OnInit {
       });
       await alert.present();
 
-      // volver ala página de login
+      //Volver ala página de login
       this.navCtrl.navigateRoot('login');
     } else {
       const alert = await this.alertController.create({
