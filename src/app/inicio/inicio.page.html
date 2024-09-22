@@ -1,0 +1,18 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>Inicio</ion-title>
+  </ion-toolbar>
+</ion-header>
+<br>
+
+<ion-content class="ion-text-center">
+  <ion-label>Bienvenido, {{ nombreUsuario }}</ion-label>
+</ion-content>
+
+<ion-footer>
+  <ion-toolbar color="primary">
+    <ion-buttons slot="end">
+      <ion-button [routerLink]="['/login']" expand="full">Volver a inicio de sesion</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-footer>
