@@ -1,25 +1,24 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
+import { StorageService } from '../services/storage.service'; 
 
 @Component({
   selector: 'app-inicio',
   templateUrl: './inicio.page.html',
   styleUrls: ['./inicio.page.scss'],
 })
-export class InicioPage implements OnInit {
+export class InicioPage {
 
   nombreUsuario: string = '';
 
-  constructor() { }
+  constructor(private storageService: StorageService) { }
 
-  ngOnInit() {
-    //buscar usuario en localstorage
-    const usuarioJSON = localStorage.getItem('usuario');
-    const usuario = usuarioJSON !== null ? JSON.parse(usuarioJSON) : null;
-
-    // Si el usuario existe guardamos su nombre
-    if (usuario && usuario.nombre) {
-      this.nombreUsuario = usuario.nombre;
+  async ionViewWillEnter() {
+    // Recuperar el nombre del usuario que inicioó sesión o el usuario actual
+    const currentUser = await this.storageService.get('currentUser');
+  
+    // almacenar nombre en variable nombreUsuario para mostrarlo en saludo
+    if (currentUser) {
+      this.nombreUsuario = currentUser;
     }
   }
-
 }
