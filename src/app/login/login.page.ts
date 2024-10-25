@@ -6,6 +6,8 @@ import {
   FormBuilder
 } from '@angular/forms';
 import { AlertController, NavController, ToastController } from '@ionic/angular';
+import { StorageService } from '../services/storage.service'; // Importar el servicio
+import { Usuario } from '../usuario.interface'; //importar interfaz de usuario
 
 @Component({
   selector: 'app-login',
@@ -20,41 +22,45 @@ export class LoginPage implements OnInit {
     public fb: FormBuilder,
     public alertController: AlertController,
     public navCtrl: NavController,
-    public toastController: ToastController) { 
-
+    public toastController: ToastController,
+    private storageService: StorageService // implementar para poder utilizar atorage
+  ) { 
     this.formularioLogin = this.fb.group({
-      'nombre': new FormControl("",Validators.required),
-      'password': new FormControl("",Validators.required)
-    })
-
+      'nombre': new FormControl("", Validators.required),
+      'password': new FormControl("", Validators.required)
+    });
   }
 
-  ngOnInit() {
-  }
-  //Buscar y Validar usuario en localstorage e ingresar
-  async ingresar(){
-    var f = this.formularioLogin.value;
+  ngOnInit() { }
 
-    var usuarioJSON = localStorage.getItem('usuario');
-    var usuario = usuarioJSON !== null ? JSON.parse(usuarioJSON) : null;
-    
-    
-    if(usuario.nombre == f.nombre && usuario.password == f.password){
-      console.log('Ingresado');
-      localStorage.setItem('ingresado','true');
-      this.navCtrl.navigateRoot('inicio');
-      
-    }else{
-      const alert = await this.alertController.create({
-        header: 'Datos incorrectos',
-        message: 'Los datos que ingresaste son incorrectos.',
-        buttons: ['Aceptar']
-      });
-  
-      await alert.present();
-    }
+  // buscar y Validar usuario en Ionic Storage e ingresar
+  async ingresar() {
+  var f = this.formularioLogin.value;
+
+  // Obtener la lista de usuarios
+  let usuarios: Usuario[] = await this.storageService.get('usuarios');
+  if (!usuarios) {
+    usuarios = []; // Inicializar vacío el array en caso de no haber usuarios
   }
-  //Formulario de alerta para registrar usuario
+
+  // Buscar si el nombre y contraseña coinciden con algún usuario
+  const usuario = usuarios.find(u => u.nombre === f.nombre && u.password === f.password);
+
+  if (usuario) {
+    console.log('Ingresado');
+    await this.storageService.set('ingresado', 'true');
+    await this.storageService.set('currentUser', usuario.nombre);
+    this.navCtrl.navigateRoot('inicio');
+  } else {
+    const alert = await this.alertController.create({
+      header: 'Datos incorrectos',
+      message: 'Los datos que ingresaste son incorrectos.',
+      buttons: ['Aceptar']
+    });
+    await alert.present();
+  }
+}
+
   async registrarUsuario() {
     const alert = await this.alertController.create({
       header: 'Registro de Usuario',
@@ -86,14 +92,22 @@ export class LoginPage implements OnInit {
               return;
             }
   
-            // Guardar usuario en localStorage
-            const usuario = {
+            // Obtener la lista de usuarios
+            let usuarios = await this.storageService.get('usuarios');
+            if (!usuarios) {
+              usuarios = []; // lo mismo Inicializar vacío el array en caso de no haber usuarios
+            }
+  
+            // Agregar el nuevo usuario al array
+            usuarios.push({
               nombre: data.nombre,
               password: data.password
-            };
-            localStorage.setItem('usuario', JSON.stringify(usuario));
+            });
   
-            // Alerta de registro existoso
+            // Guardar el array actualizado de usuarios en Storage
+            await this.storageService.set('usuarios', usuarios);
+  
+            // Alerta de registro exitoso
             const successAlert = await this.alertController.create({
               header: 'Registro Exitoso',
               message: 'Te has registrado exitosamente',
@@ -107,5 +121,4 @@ export class LoginPage implements OnInit {
   
     await alert.present();
   }
-  
 }
