@@ -6,13 +6,28 @@
 <br>
 
 <ion-content class="ion-text-center">
+  <!-- Mostrar el nombre del usuario -->
   <ion-label>Bienvenido, {{ nombreUsuario }}</ion-label>
+
+  <br><br>
+
+  <!-- Mostrar la información del clima si está disponible -->
+  <ion-card *ngIf="weatherData">
+    <ion-card-header>
+      <ion-card-title>Clima en {{ weatherData.name }}</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <p>Temperatura: {{ weatherData.main.temp }}°C</p>
+      <p>Condición: {{ weatherData.weather[0].description }}</p>
+      <p>Humedad: {{ weatherData.main.humidity }}%</p>
+    </ion-card-content>
+  </ion-card>
 </ion-content>
 
 <ion-footer>
   <ion-toolbar color="primary">
     <ion-buttons slot="end">
-      <ion-button [routerLink]="['/login']" expand="full">Volver al inicio de sesion</ion-button>
+      <ion-button [routerLink]="['/login']" expand="full">Volver al inicio de sesión</ion-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-footer>
