@@ -1,6 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormControl, Validators, FormBuilder } from '@angular/forms';
 import { AlertController, NavController} from '@ionic/angular';
+import { StorageService } from '../services/storage.service'; // Importar el servicio 
+import { Usuario } from '../usuario.interface'; // importar interfaz usuario
+
 
 @Component({
   selector: 'app-restablecer-contrasena',
@@ -14,9 +17,9 @@ export class RestablecerContrasenaPage implements OnInit {
   constructor(
     public fb: FormBuilder,
     public alertController: AlertController,
-    public navCtrl: NavController
+    public navCtrl: NavController,
+    private storageService: StorageService // implementar para poder utilizar storage igual que en login.page.ts
   ) {
-    // Definir los controles del formulario
     this.formularioRecuperar = this.fb.group({
       'nombre': new FormControl("", Validators.required),
       'password': new FormControl("", Validators.required),
@@ -39,14 +42,21 @@ export class RestablecerContrasenaPage implements OnInit {
       return;
     }
 
-    var usuarioJSON = localStorage.getItem('usuario');
-    var usuario = usuarioJSON !== null ? JSON.parse(usuarioJSON) : null;
+    // Obtener la lista de usuarios
+    let usuarios: Usuario[] = await this.storageService.get('usuarios');
+    if (!usuarios) {
+      usuarios = []; // Inicializar vacío si no hay usuarios registrados
+    }
 
-    // Verificar si el nombre de usuario existe
-    if (usuario && usuario.nombre === f.nombre) {
-      // Actualizar la contraseña en el localStorage
+    // Buscar si el usuario existe en la lista de usuarios
+    const usuario = usuarios.find(u => u.nombre === f.nombre);
+
+    if (usuario) {
+      // Actualizar la contraseña del usuario
       usuario.password = f.password;
-      localStorage.setItem('usuario', JSON.stringify(usuario));
+
+      // Guardar la lista de usuarios actualizada
+      await this.storageService.set('usuarios', usuarios);
 
       const alert = await this.alertController.create({
         header: 'Contraseña restablecida',

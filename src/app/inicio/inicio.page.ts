@@ -1,4 +1,6 @@
+
 import { Component, OnInit } from '@angular/core';
+import { StorageService } from '../services/storage.service';
 import { WeatherService } from '../services/weather.service'; // Importa el servicio del clima si lo has creado
 
 @Component({
@@ -6,18 +8,22 @@ import { WeatherService } from '../services/weather.service'; // Importa el serv
   templateUrl: './inicio.page.html',
   styleUrls: ['./inicio.page.scss'],
 })
-export class InicioPage implements OnInit {
+export class InicioPage {
 
   nombreUsuario: string = '';
+
   weatherData: any; // Variable para los datos del clima
   city: string = 'Santiago'; // Ciudad para la búsqueda del clima, puedes cambiarla o hacerlo dinámico
-  constructor(private weatherService: WeatherService) { } // Inyecta el servicio del clima
+      
+  constructor(private storageService: StorageService, private weatherService: WeatherService ) { }
 
-  ngOnInit() {
-    const usuarioJSON = localStorage.getItem('usuario');
-    const usuario = usuarioJSON !== null ? JSON.parse(usuarioJSON) : null;
-    if (usuario && usuario.nombre) {
-      this.nombreUsuario = usuario.nombre;
+  async ionViewWillEnter() {
+    // Recuperar el nombre del usuario que inicioó sesión o el usuario actual
+    const currentUser = await this.storageService.get('currentUser');
+  
+    // almacenar nombre en variable nombreUsuario para mostrarlo en saludo
+    if (currentUser) {
+      this.nombreUsuario = currentUser;
     }
 
     // Llamada al servicio del clima por ciudad
@@ -31,5 +37,4 @@ export class InicioPage implements OnInit {
       }
     );
   }
-
 }
