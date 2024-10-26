@@ -11,15 +11,11 @@ export class InicioPage implements OnInit {
   nombreUsuario: string = '';
   weatherData: any; // Variable para los datos del clima
   city: string = 'Santiago'; // Ciudad para la búsqueda del clima, puedes cambiarla o hacerlo dinámico
-
   constructor(private weatherService: WeatherService) { } // Inyecta el servicio del clima
 
   ngOnInit() {
-    // Buscar usuario en localStorage
     const usuarioJSON = localStorage.getItem('usuario');
     const usuario = usuarioJSON !== null ? JSON.parse(usuarioJSON) : null;
-
-    // Si el usuario existe, guardamos su nombre
     if (usuario && usuario.nombre) {
       this.nombreUsuario = usuario.nombre;
     }
