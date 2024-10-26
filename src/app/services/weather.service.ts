@@ -14,7 +14,7 @@ export class WeatherService {
 
   // Método para obtener el clima por ciudad
   getWeatherByCity(city: string): Observable<any> {
-    const url = `${this.apiUrl}?q=${city}&appid=${this.apiKey}&units=metric`;
+    const url = `${this.apiUrl}?q=${city}&appid=${this.apiKey}&units=metric&lang=es`;
     return this.http.get(url);
   }
 }
