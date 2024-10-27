@@ -1,13 +1,12 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 
-import { LoginPage } from './login.page';
-import { AngularFireAuthGuard } from '@angular/fire/auth-guard';
+import { E404Page } from './e404.page';
 
 const routes: Routes = [
   {
     path: '',
-    component: LoginPage, canActivate: [AngularFireAuthGuard]
+    component: E404Page
   }
 ];
 
@@ -15,4 +14,4 @@ const routes: Routes = [
   imports: [RouterModule.forChild(routes)],
   exports: [RouterModule],
 })
-export class LoginPageRoutingModule {}
+export class E404PageRoutingModule {}
