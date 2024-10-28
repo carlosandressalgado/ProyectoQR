@@ -1,27 +1,25 @@
-
 import { Component, OnInit } from '@angular/core';
 import { StorageService } from '../services/storage.service';
-import { WeatherService } from '../services/weather.service'; // Importa el servicio del clima si lo has creado
+import { WeatherService } from '../services/weather.service';
 
 @Component({
   selector: 'app-inicio',
   templateUrl: './inicio.page.html',
   styleUrls: ['./inicio.page.scss'],
 })
-export class InicioPage {
+export class InicioPage implements OnInit {
 
   nombreUsuario: string = '';
-
   weatherData: any; // Variable para los datos del clima
-  city: string = 'Santiago'; // Ciudad para la búsqueda del clima, puedes cambiarla o hacerlo dinámico
-      
+  city: string = 'Santiago'; // Ciudad para la búsqueda del clima
+
   constructor(private storageService: StorageService, private weatherService: WeatherService ) { }
 
-  async ionViewWillEnter() {
-    // Recuperar el nombre del usuario que inicioó sesión o el usuario actual
+  async ngOnInit() {
+    // Recuperar el nombre del usuario que inició sesión o el usuario actual
     const currentUser = await this.storageService.get('currentUser');
   
-    // almacenar nombre en variable nombreUsuario para mostrarlo en saludo
+    // Almacenar nombre en variable nombreUsuario para mostrarlo en saludo
     if (currentUser) {
       this.nombreUsuario = currentUser;
     }
