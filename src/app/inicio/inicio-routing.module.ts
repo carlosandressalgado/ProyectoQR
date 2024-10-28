@@ -2,12 +2,12 @@ import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 
 import { InicioPage } from './inicio.page';
-import { AngularFireAuthGuard } from '@angular/fire/auth-guard';
+import { DbService } from '../services/db.service';
 
 const routes: Routes = [
   {
     path: '',
-    component: InicioPage, canActivate: [AngularFireAuthGuard]
+    component: InicioPage, canActivate: [DbService]
   }
 ];
 

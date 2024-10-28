@@ -9,36 +9,28 @@ const routes: Routes = [
     pathMatch: 'full'
   },
   {
-    path: '**',
-    redirectTo: 'e404',
-    pathMatch: 'full'
-  },
-  {
     path: 'login',
-    loadChildren: () => import('./login/login.module').then( m => m.LoginPageModule),
-    canActivate: [DbService]
-  
+    loadChildren: () => import('./login/login.module').then(m => m.LoginPageModule)
   },
   {
     path: 'inicio',
-    loadChildren: () => import('./inicio/inicio.module').then( m => m.InicioPageModule),
+    loadChildren: () => import('./inicio/inicio.module').then(m => m.InicioPageModule),
     canActivate: [DbService]
-  
-    
-
   },
   {
     path: 'restablecer-contrasena',
-    loadChildren: () => import('./restablecer-contrasena/restablecer-contrasena.module').then( m => m.RestablecerContrasenaPageModule),
+    loadChildren: () => import('./restablecer-contrasena/restablecer-contrasena.module').then(m => m.RestablecerContrasenaPageModule),
     canActivate: [DbService]
-   
   },
   {
     path: 'e404',
-    loadChildren: () => import('./pages/e404/e404.module').then( m => m.E404PageModule)
+    loadChildren: () => import('./pages/e404/e404.module').then(m => m.E404PageModule)
   },
-
-  
+  {
+    path: '**', // para rutas no definidas
+    redirectTo: 'e404',
+    pathMatch: 'full'
+  }
 ];
 
 @NgModule({
