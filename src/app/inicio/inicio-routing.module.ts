@@ -2,11 +2,12 @@ import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 
 import { InicioPage } from './inicio.page';
+import { AngularFireAuthGuard } from '@angular/fire/auth-guard';
 
 const routes: Routes = [
   {
     path: '',
-    component: InicioPage
+    component: InicioPage, canActivate: [AngularFireAuthGuard]
   }
 ];
 
