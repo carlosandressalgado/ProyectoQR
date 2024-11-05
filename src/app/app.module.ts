@@ -9,9 +9,10 @@ import { AppRoutingModule } from './app-routing.module';
 
 import { HttpClientModule } from '@angular/common/http';
 import { IonicStorageModule } from '@ionic/storage-angular';
+import { HistorialAsistenciasComponent } from './historial-asistencias/historial-asistencias.component';
 
 @NgModule({
-  declarations: [AppComponent],
+  declarations: [AppComponent, HistorialAsistenciasComponent  ],
   imports: [BrowserModule, IonicModule.forRoot(), AppRoutingModule, HttpClientModule, IonicStorageModule.forRoot()],
 
   providers: [{ provide: RouteReuseStrategy, useClass: IonicRouteStrategy }],

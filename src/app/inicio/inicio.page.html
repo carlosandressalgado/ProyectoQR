@@ -22,6 +22,16 @@
       <p>Humedad: {{ weatherData.main.humidity }}%</p>
     </ion-card-content>
   </ion-card>
+
+<ion-item *ngFor="let clase of clases">
+  <ion-label>{{ clase.nombre }}</ion-label>
+  <ion-button color="tertiary" (click)="marcarAsistencia(clase.id)">Marcar asistencia</ion-button>
+</ion-item>
+
+<br>
+<ion-button color="tertiary" expand="block" (click)="mostrarHistorial()">
+  Ver Historial de Asistencias
+</ion-button>
 </ion-content>
 
 <ion-footer>
