@@ -103,6 +103,7 @@ export class LoginPage implements OnInit {
               nombre: data.nombre,
               password: data.password
             });
+            
   
             // Guardar el array actualizado de usuarios en Storage
             await this.storageService.set('usuarios', usuarios);
@@ -119,6 +120,46 @@ export class LoginPage implements OnInit {
       ]
     });
   
+    await alert.present();
+  }
+  // Función para mostrar alerta de "Inicio profesor"
+  async mostrarMensajeInicioProfesor() {
+    const alert = await this.alertController.create({
+      header: 'Inicio Profesor',
+      inputs: [
+        {
+          name: 'nombre',
+          type: 'text',
+          placeholder: 'Nombre'
+        },
+        {
+          name: 'password',
+          type: 'password',
+          placeholder: 'Contraseña'
+        }
+      ],
+      buttons: [
+        {
+          text: 'Cancelar',
+          role: 'cancel'
+        },
+        {
+          text: 'Ingresar',
+          handler:async(data) => {
+            if (!data.nombre || !data.password) {
+              const errorAlert = await this.alertController.create({
+                header: 'Error',
+                message: 'Tienes que llenar todos los datos',
+                buttons: ['Aceptar']
+              });
+              await errorAlert.present();
+              return;
+            }
+            this.navCtrl.navigateRoot('profesor-inicio');
+          }
+        }
+      ]
+    });
     await alert.present();
   }
 }
