@@ -1,0 +1,34 @@
+<ion-content class="ion-text-center">
+  <h1>Bienvenido, {{ nombreProfesor }}</h1>
+
+  <ion-item>
+    <ion-label>Asignatura </ion-label>
+    <ion-select [(ngModel)]="asignaturaSeleccionada">
+      <ion-select-option *ngFor="let asignatura of asignaturas" [value]="asignatura.id">
+        {{ asignatura.nombre }}
+      </ion-select-option>
+    </ion-select>
+  </ion-item>
+
+  <ion-item>
+    <ion-label>Sección </ion-label>
+    <ion-select [(ngModel)]="seccionSeleccionada">
+      <ion-select-option *ngFor="let seccion of secciones" [value]="seccion">
+        {{ seccion }}
+      </ion-select-option>
+    </ion-select>
+  </ion-item>
+
+  <ion-item>
+    <ion-label>Sala </ion-label>
+    <ion-select [(ngModel)]="salaSeleccionada">
+      <ion-select-option *ngFor="let sala of salas" [value]="sala">
+        {{ sala }}
+      </ion-select-option>
+    </ion-select>
+  </ion-item>
+
+  <br>
+  <ion-button expand="block" (click)="generarQR()">Generar Código QR</ion-button>
+
+</ion-content>
