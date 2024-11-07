@@ -23,6 +23,10 @@ const routes: Routes = [
     canActivate: [DbService]
   },
   {
+    path: 'profesor-inicio',
+    loadChildren: () => import('./profesor-inicio/profesor-inicio.module').then( m => m.ProfesorInicioPageModule)
+  },
+  {
     path: 'e404',
     loadChildren: () => import('./pages/e404/e404.module').then(m => m.E404PageModule)
   },
