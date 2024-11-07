@@ -23,7 +23,7 @@ export class LoginPage implements OnInit {
     public alertController: AlertController,
     public navCtrl: NavController,
     public toastController: ToastController,
-    private storageService: StorageService // Implementar para poder utilizar storage
+    private storageService: StorageService // implementar para poder utilizar atorage
   ) { 
     this.formularioLogin = this.fb.group({
       'nombre': new FormControl("", Validators.required),
@@ -33,33 +33,33 @@ export class LoginPage implements OnInit {
 
   ngOnInit() { }
 
-  // Buscar y validar usuario en Ionic Storage e ingresar
+  // buscar y Validar usuario en Ionic Storage e ingresar
   async ingresar() {
-    var f = this.formularioLogin.value;
+  var f = this.formularioLogin.value;
 
-    // Obtener la lista de usuarios
-    let usuarios: Usuario[] = await this.storageService.get('usuarios');
-    if (!usuarios) {
-      usuarios = []; // Inicializar vacío el array en caso de no haber usuarios
-    }
-
-    // Buscar si el nombre y contraseña coinciden con algún usuario
-    const usuario = usuarios.find(u => u.nombre === f.nombre && u.password === f.password);
-
-    if (usuario) {
-      console.log('Ingresado');
-      await this.storageService.set('ingresado', 'true');
-      await this.storageService.set('currentUser', usuario.nombre);
-      this.navCtrl.navigateRoot('inicio');
-    } else {
-      const alert = await this.alertController.create({
-        header: 'Datos incorrectos',
-        message: 'Los datos que ingresaste son incorrectos.',
-        buttons: ['Aceptar']
-      });
-      await alert.present();
-    }
+  // Obtener la lista de usuarios
+  let usuarios: Usuario[] = await this.storageService.get('usuarios');
+  if (!usuarios) {
+    usuarios = []; // Inicializar vacío el array en caso de no haber usuarios
   }
+
+  // Buscar si el nombre y contraseña coinciden con algún usuario
+  const usuario = usuarios.find(u => u.nombre === f.nombre && u.password === f.password);
+
+  if (usuario) {
+    console.log('Ingresado');
+    await this.storageService.set('ingresado', 'true');
+    await this.storageService.set('currentUser', usuario.nombre);
+    this.navCtrl.navigateRoot('inicio');
+  } else {
+    const alert = await this.alertController.create({
+      header: 'Datos incorrectos',
+      message: 'Los datos que ingresaste son incorrectos.',
+      buttons: ['Aceptar']
+    });
+    await alert.present();
+  }
+}
 
   async registrarUsuario() {
     const alert = await this.alertController.create({
@@ -95,7 +95,7 @@ export class LoginPage implements OnInit {
             // Obtener la lista de usuarios
             let usuarios = await this.storageService.get('usuarios');
             if (!usuarios) {
-              usuarios = []; // Inicializar vacío el array en caso de no haber usuarios
+              usuarios = []; // lo mismo Inicializar vacío el array en caso de no haber usuarios
             }
   
             // Agregar el nuevo usuario al array
@@ -122,7 +122,6 @@ export class LoginPage implements OnInit {
   
     await alert.present();
   }
-
   // Función para mostrar alerta de "Inicio profesor"
   async mostrarMensajeInicioProfesor() {
     const alert = await this.alertController.create({
@@ -157,4 +156,3 @@ export class LoginPage implements OnInit {
     await alert.present();
   }
 }
-
