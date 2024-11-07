@@ -1,13 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import {
-  FormGroup,
-  FormControl,
-  Validators,
-  FormBuilder
-} from '@angular/forms';
+import { FormGroup, FormControl, Validators, FormBuilder } from '@angular/forms';
 import { AlertController, NavController, ToastController } from '@ionic/angular';
 import { StorageService } from '../services/storage.service'; // Importar el servicio
-import { Usuario } from '../usuario.interface'; //importar interfaz de usuario
+import { Usuario } from '../usuario.interface'; // Importar interfaz de usuario
 
 @Component({
   selector: 'app-login',
@@ -15,7 +10,6 @@ import { Usuario } from '../usuario.interface'; //importar interfaz de usuario
   styleUrls: ['./login.page.scss'],
 })
 export class LoginPage implements OnInit {
-
   formularioLogin: FormGroup;
 
   constructor(
@@ -23,8 +17,8 @@ export class LoginPage implements OnInit {
     public alertController: AlertController,
     public navCtrl: NavController,
     public toastController: ToastController,
-    private storageService: StorageService // implementar para poder utilizar atorage
-  ) { 
+    private storageService: StorageService
+  ) {
     this.formularioLogin = this.fb.group({
       'nombre': new FormControl("", Validators.required),
       'password': new FormControl("", Validators.required)
@@ -33,34 +27,69 @@ export class LoginPage implements OnInit {
 
   ngOnInit() { }
 
-  // buscar y Validar usuario en Ionic Storage e ingresar
-  async ingresar() {
-  var f = this.formularioLogin.value;
-
-  // Obtener la lista de usuarios
-  let usuarios: Usuario[] = await this.storageService.get('usuarios');
-  if (!usuarios) {
-    usuarios = []; // Inicializar vacío el array en caso de no haber usuarios
-  }
-
-  // Buscar si el nombre y contraseña coinciden con algún usuario
-  const usuario = usuarios.find(u => u.nombre === f.nombre && u.password === f.password);
-
-  if (usuario) {
-    console.log('Ingresado');
-    await this.storageService.set('ingresado', 'true');
-    await this.storageService.set('currentUser', usuario.nombre);
-    this.navCtrl.navigateRoot('inicio');
-  } else {
+  // Función para mostrar alerta de "Inicio profesor"
+  async mostrarMensajeInicioProfesor() {
     const alert = await this.alertController.create({
-      header: 'Datos incorrectos',
-      message: 'Los datos que ingresaste son incorrectos.',
-      buttons: ['Aceptar']
+      header: 'Inicio Profesor',
+      inputs: [
+        {
+          name: 'nombre',
+          type: 'text',
+          placeholder: 'Nombre'
+        },
+        {
+          name: 'password',
+          type: 'password',
+          placeholder: 'Contraseña'
+        }
+      ],
+      buttons: [
+        {
+          text: 'Cancelar',
+          role: 'cancel'
+        },
+        {
+          text: 'Ingresar',
+          handler: (data) => {
+            // Aquí puedes manejar los datos ingresados, como validarlos o hacer alguna acción
+            console.log('Nombre:', data.nombre);
+            console.log('Contraseña:', data.password);
+          }
+        }
+      ]
     });
     await alert.present();
   }
-}
 
+  // Función para validar el ingreso de usuario
+  async ingresar() {
+    const f = this.formularioLogin.value;
+
+    // Obtener la lista de usuarios
+    let usuarios: Usuario[] = await this.storageService.get('usuarios');
+    if (!usuarios) {
+      usuarios = []; // Inicializar vacío el array en caso de no haber usuarios
+    }
+
+    // Buscar si el nombre y contraseña coinciden con algún usuario
+    const usuario = usuarios.find(u => u.nombre === f.nombre && u.password === f.password);
+
+    if (usuario) {
+      console.log('Ingresado');
+      await this.storageService.set('ingresado', 'true');
+      await this.storageService.set('currentUser', usuario.nombre);
+      this.navCtrl.navigateRoot('inicio');
+    } else {
+      const alert = await this.alertController.create({
+        header: 'Datos incorrectos',
+        message: 'Los datos que ingresaste son incorrectos.',
+        buttons: ['Aceptar']
+      });
+      await alert.present();
+    }
+  }
+
+  // Función para registrar un nuevo usuario
   async registrarUsuario() {
     const alert = await this.alertController.create({
       header: 'Registro de Usuario',
@@ -95,7 +124,7 @@ export class LoginPage implements OnInit {
             // Obtener la lista de usuarios
             let usuarios = await this.storageService.get('usuarios');
             if (!usuarios) {
-              usuarios = []; // lo mismo Inicializar vacío el array en caso de no haber usuarios
+              usuarios = []; // Inicializar vacío el array en caso de no haber usuarios
             }
   
             // Agregar el nuevo usuario al array
@@ -118,7 +147,6 @@ export class LoginPage implements OnInit {
         }
       ]
     });
-  
     await alert.present();
   }
 }
