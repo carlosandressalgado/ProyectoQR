@@ -145,10 +145,17 @@ export class LoginPage implements OnInit {
         },
         {
           text: 'Ingresar',
-          handler: (data) => {
-            // Aquí puedes manejar los datos ingresados, como validarlos o hacer alguna acción
-            console.log('Nombre:', data.nombre);
-            console.log('Contraseña:', data.password);
+          handler:async(data) => {
+            if (!data.nombre || !data.password) {
+              const errorAlert = await this.alertController.create({
+                header: 'Error',
+                message: 'Tienes que llenar todos los datos',
+                buttons: ['Aceptar']
+              });
+              await errorAlert.present();
+              return;
+            }
+            this.navCtrl.navigateRoot('profesor-inicio');
           }
         }
       ]
