@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
-import { DbService } from './services/db.service';
+import { AlumnoGuard } from './services/alumno.guard';
+import { ProfesorGuard } from './services/profesor.guard';
 
 const routes: Routes = [
   {
@@ -15,16 +16,16 @@ const routes: Routes = [
   {
     path: 'inicio',
     loadChildren: () => import('./inicio/inicio.module').then(m => m.InicioPageModule),
-    canActivate: [DbService]
+    canActivate: [AlumnoGuard]
   },
   {
     path: 'restablecer-contrasena',
     loadChildren: () => import('./restablecer-contrasena/restablecer-contrasena.module').then(m => m.RestablecerContrasenaPageModule),
-    canActivate: [DbService]
   },
   {
     path: 'profesor-inicio',
-    loadChildren: () => import('./profesor-inicio/profesor-inicio.module').then( m => m.ProfesorInicioPageModule)
+    loadChildren: () => import('./profesor-inicio/profesor-inicio.module').then( m => m.ProfesorInicioPageModule),
+    canActivate: [ProfesorGuard]
   },
   {
     path: 'e404',
