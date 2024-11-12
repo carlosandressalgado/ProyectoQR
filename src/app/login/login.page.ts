@@ -8,6 +8,7 @@ import {
 import { AlertController, NavController, ToastController } from '@ionic/angular';
 import { StorageService } from '../services/storage.service'; // Importar el servicio
 import { Usuario } from '../usuario.interface'; //importar interfaz de usuario
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-login',
@@ -23,7 +24,8 @@ export class LoginPage implements OnInit {
     public alertController: AlertController,
     public navCtrl: NavController,
     public toastController: ToastController,
-    private storageService: StorageService // implementar para poder utilizar atorage
+    private storageService: StorageService, // implementar para poder utilizar atorage
+    private router: Router
   ) { 
     this.formularioLogin = this.fb.group({
       'nombre': new FormControl("", Validators.required),
@@ -47,10 +49,12 @@ export class LoginPage implements OnInit {
   const usuario = usuarios.find(u => u.nombre === f.nombre && u.password === f.password);
 
   if (usuario) {
-    console.log('Ingresado');
     await this.storageService.set('ingresado', 'true');
     await this.storageService.set('currentUser', usuario.nombre);
-    this.navCtrl.navigateRoot('inicio');
+    await this.storageService.set('tipoUsuario', 'alumno'); 
+    this.router.navigateByUrl('/inicio');
+    console.log(await this.storageService.get('ingresado'));
+    console.log(await this.storageService.get('tipoUsuario'));  
   } else {
     const alert = await this.alertController.create({
       header: 'Datos incorrectos',
@@ -155,7 +159,29 @@ export class LoginPage implements OnInit {
               await errorAlert.present();
               return;
             }
-            this.navCtrl.navigateRoot('profesor-inicio');
+            const profesores = [
+              { nombre: 'juan carlos', password: 'juca123' },
+              { nombre: 'felipe perez', password: 'fepe123' },
+              { nombre: 'julieta venegas', password: 'juve123' }
+            ];
+  
+            const profesor = profesores.find(p => p.nombre === data.nombre && p.password === data.password);
+  
+            if (profesor) {
+              // Almacenar que un profesor ha iniciado sesión
+              await this.storageService.set('ingresado', 'true');
+              await this.storageService.set('tipoUsuario', 'profesor'); // Almacenar el tipo de usuario
+              console.log(await this.storageService.get('ingresado'));
+              console.log(await this.storageService.get('tipoUsuario')); 
+              this.navCtrl.navigateRoot('profesor-inicio');
+            } else {
+              const errorAlert = await this.alertController.create({
+                header: 'Error',
+                message: 'Nombre o contraseña incorrectos.',
+                buttons: ['Aceptar']
+              });
+              await errorAlert.present();
+            }
           }
         }
       ]
