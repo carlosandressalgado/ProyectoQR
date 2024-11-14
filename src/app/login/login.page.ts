@@ -171,6 +171,7 @@ export class LoginPage implements OnInit {
               // Almacenar que un profesor ha iniciado sesión
               await this.storageService.set('ingresado', 'true');
               await this.storageService.set('tipoUsuario', 'profesor'); // Almacenar el tipo de usuario
+              await this.storageService.set('currentUser', profesor.nombre);
               console.log(await this.storageService.get('ingresado'));
               console.log(await this.storageService.get('tipoUsuario')); 
               this.navCtrl.navigateRoot('profesor-inicio');

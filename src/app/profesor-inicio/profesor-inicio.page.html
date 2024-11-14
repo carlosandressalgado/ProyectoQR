@@ -1,5 +1,5 @@
 <ion-content class="ion-text-center">
-  <h1>Bienvenido, {{ nombreProfesor }}</h1>
+  <h1>Bienvenid&#64;, {{ nombreProfesor }}</h1>
 
   <ion-item>
     <ion-label>Asignatura </ion-label>
@@ -30,5 +30,23 @@
 
   <br>
   <ion-button expand="block" (click)="generarQR()">Generar Código QR</ion-button>
-
+  <ion-modal [isOpen]="isModalOpen" (ionModalDidDismiss)="closeModal()">
+    <ng-template>
+      <ion-content class="qr-modal-content">
+        <div class="qr-code-container">
+          <img [src]="qrCodeUrl" alt="Código QR" class="qr-code">
+        </div>
+        <ion-button (click)="closeModal()">Volver</ion-button>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
 </ion-content>
+
+<ion-footer>
+  <ion-toolbar color="primary">
+    <ion-buttons slot="end">
+      <ion-button [routerLink]="['/login']" expand="full">Salir</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-footer>
+
