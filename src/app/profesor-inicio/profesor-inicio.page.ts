@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { AlertController } from '@ionic/angular';
+import { StorageService } from '../services/storage.service';
+import { toDataURL } from 'qrcode';
 
 @Component({
   selector: 'app-profesor-inicio',
@@ -14,6 +16,8 @@ export class ProfesorInicioPage implements OnInit {
   seccionSeleccionada: string = ''; 
   salaSeleccionada: string = ''; 
   qrData: string = ''; 
+  qrCodeUrl: string | null = null;
+  isModalOpen: boolean = false; 
 
   asignaturas = [
     { id: 'PGY4121', nombre: 'Programación de Apps Móviles' },
@@ -23,11 +27,16 @@ export class ProfesorInicioPage implements OnInit {
   secciones = ['001D', '002D', '003D', '004D', '001V', '002V', '003V'];
   salas = ['L1', 'L2', 'L3', 'L4', 'L5', 'L6', 'L7', 'L8', 'L9', 'L10'];
 
-  constructor(private alertController: AlertController,) {}
+  constructor(private alertController: AlertController, private storageService: StorageService) {}
 
   async ngOnInit() {
-    // Saludo al profesor al igual que el inicio alumno, pendiente
-  }
+    
+const currentUser = await this.storageService.get('currentUser');
+    
+if (currentUser) {
+  this.nombreProfesor = currentUser;
+}
+    }
 
   async generarQR() {
     if (!this.asignaturaSeleccionada || !this.seccionSeleccionada || !this.salaSeleccionada) {
@@ -46,9 +55,21 @@ export class ProfesorInicioPage implements OnInit {
       day: '2-digit'
     }).replace(/[^0-9]/g, '');
 
-    this.qrData = `${this.asignaturaSeleccionada}|${this.seccionSeleccionada}|${this.salaSeleccionada}|${fechaActual}`;
+    const qrData = `${this.asignaturaSeleccionada}|${this.seccionSeleccionada}|${this.salaSeleccionada}|${fechaActual}`;
 
-  alert(`Datos del QR: ${this.qrData}`);
+  toDataURL(qrData, { errorCorrectionLevel: 'H' })
+  .then((url: string) => {
+    this.qrCodeUrl = url; 
+    this.isModalOpen = true;
+    console.log('Código QR generado:', this.qrCodeUrl);
+  })
+  .catch((err: any) => {
+    console.error('Error generando el código QR', err);
+  });
 }
+closeModal() {
+  this.isModalOpen = false; 
+}
+
 }
 
