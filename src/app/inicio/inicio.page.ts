@@ -4,6 +4,7 @@ import { WeatherService } from '../services/weather.service';
 import { AsistenciaService } from '../services/asistencia.service';
 import { HistorialAsistenciasComponent } from '../historial-asistencias/historial-asistencias.component'; // Ajusta la ruta según la estructura
 import { ModalController } from '@ionic/angular';
+import { AlertController } from '@ionic/angular';
 
 
 @Component({
@@ -16,13 +17,15 @@ export class InicioPage implements OnInit {
   nombreUsuario: string = '';
   weatherData: any; // Variable para los datos del clima
   city: string = 'Santiago'; // Ciudad para la búsqueda del clima
-  clases = [
-    { id: '1', nombre: 'Programacion de aplicaciones moviles' },
-    { id: '2', nombre: 'Arquitectura' },
-    { id: '3', nombre: 'Calidad de software' }
-  ];
+  qrResult: string = '';
+  escaneando: boolean = false;
+  asignaturaSeleccionada: string = '';
+  seccionSeleccionada: string = '';
+  salaSeleccionada: string = '';
+  fechaSeleccionada: string = ''; 
 
-  constructor(private storageService: StorageService, private weatherService: WeatherService, private asistenciaService: AsistenciaService, private modalController: ModalController ) { }
+  constructor(private storageService: StorageService, private weatherService: WeatherService, private asistenciaService: AsistenciaService,
+     private modalController: ModalController, private alertController: AlertController) { }
 
   async ngOnInit() {
     // Recuperar el nombre del usuario que inició sesión o el usuario actual
@@ -46,19 +49,80 @@ export class InicioPage implements OnInit {
   }
   // Función para abrir el modal de historial de asistencias
   async mostrarHistorial() {
-    const modal = await this.modalController.create({
-      component: HistorialAsistenciasComponent
-    });
-    await modal.present();
+    const currentUser = await this.storageService.get('currentUser');
+  
+    if (currentUser) {
+      const asistencias = await this.asistenciaService.obtenerAsistencias(currentUser);
+  
+      console.log('Historial de asistencias para', currentUser, ':', asistencias);
+  
+      const modal = await this.modalController.create({
+        component: HistorialAsistenciasComponent,
+        componentProps: { asistencias, usuarioId: currentUser } 
+      });
+      await modal.present();
+    } else {
+      alert('No hay usuario logueado');
+    }
   }
 
-  async marcarAsistencia(claseId: string) {
-    const usuarioId = this.nombreUsuario;
-    const clase = this.clases.find(c => c.id === claseId);
+  iniciarEscaneo() {
+    this.escaneando = true; // Mostrar el escáner y activar la cámara
+  }
+
+  async onCodeResult(result: string) {
+    this.qrResult = result;
   
-    if (clase) {
-      await this.asistenciaService.registrarAsistencia(clase.id, usuarioId, clase.nombre);
-      alert(`Asistencia marcada para la clase ${clase.nombre}`);
+    const [claseId, seccion, sala, fecha] = this.qrResult.split('|');
+  
+    const dia = fecha.substring(0, 2);
+    const mes = fecha.substring(2, 4); 
+    const anio = fecha.substring(4, 8);
+  
+    this.fechaSeleccionada = `${dia}/${mes}/${anio}`; 
+  
+    this.asignaturaSeleccionada = claseId; 
+    this.seccionSeleccionada = seccion;
+    this.salaSeleccionada = sala;
+  
+    const usuarioId = this.nombreUsuario;
+    const nombreClase = `Clase: ${claseId}, Sección: ${seccion}, Sala: ${sala}`;
+  
+    await this.asistenciaService.registrarAsistencia(claseId, usuarioId, nombreClase, this.fechaSeleccionada);
+    console.log('Asistencia registrada para:', nombreClase);
+    this.escaneando = false; // Detener el escaneo
+  }
+
+  async guardarAsistencia() {
+    if (this.asignaturaSeleccionada && this.seccionSeleccionada && this.salaSeleccionada) {
+      const usuarioId = this.nombreUsuario;
+      const nombreClase = `Clase: ${this.asignaturaSeleccionada}, Sección: ${this.seccionSeleccionada}, Sala: ${this.salaSeleccionada}`;
+      
+      const fecha = this.fechaSeleccionada || this.obtenerFechaActual(); 
+
+      await this.asistenciaService.registrarAsistencia(this.asignaturaSeleccionada, usuarioId, nombreClase, fecha);
+
+      const alert = await this.alertController.create({
+        header: 'Éxito',
+        message: '¡Asistencia guardada correctamente!',
+        buttons: ['Aceptar'],
+      });
+      await alert.present();
+      console.log('Asistencia guardada:', nombreClase, 'Fecha:', fecha);
+    } else {
+      alert('Por favor, ingresa todos los datos manualmente o escanea un QR.');
     }
+  }
+  obtenerFechaActual(): string {
+    const fecha = new Date();
+  
+    const fechaFormateada = fecha.toLocaleDateString('es-CL', {
+      timeZone: 'America/Santiago',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit'
+    });
+  
+    return fechaFormateada;
   }
 }

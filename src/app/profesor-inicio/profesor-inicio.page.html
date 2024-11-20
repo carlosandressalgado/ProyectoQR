@@ -36,6 +36,7 @@
         <div class="qr-code-container">
           <img [src]="qrCodeUrl" alt="Código QR" class="qr-code">
         </div>
+        <p style="text-align: center; margin-top: 8px;">{{ qrData }}</p>
         <ion-button (click)="closeModal()">Volver</ion-button>
       </ion-content>
     </ng-template>

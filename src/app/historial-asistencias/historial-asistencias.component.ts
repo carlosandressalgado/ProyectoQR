@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component,Input, OnInit } from '@angular/core';
 import { AsistenciaService } from '../services/asistencia.service';
 import { ModalController } from '@ionic/angular';
 
@@ -8,7 +8,8 @@ import { ModalController } from '@ionic/angular';
   styleUrls: ['./historial-asistencias.component.scss'],
 })
 export class HistorialAsistenciasComponent implements OnInit {
-  asistencias: any[] = [];
+  @Input() asistencias: any[] = [];
+  @Input() usuarioId: string = '';
 
   constructor(
     private asistenciaService: AsistenciaService,
@@ -17,9 +18,12 @@ export class HistorialAsistenciasComponent implements OnInit {
 
   async ngOnInit() {
     // Obtener el historial de asistencias del servicio
-    this.asistencias = await this.asistenciaService.obtenerAsistencias();
-  }
-
+    if (this.usuarioId) {
+      this.asistenciaService.obtenerAsistencias(this.usuarioId).then(asistencias => {
+        this.asistencias = asistencias;
+      });
+    }
+  }  
   // Cerrar el modal
   close() {
     this.modalController.dismiss();

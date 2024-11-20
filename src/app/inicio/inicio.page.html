@@ -23,16 +23,36 @@
     </ion-card-content>
   </ion-card>
 
-<ion-item *ngFor="let clase of clases">
-  <ion-label>{{ clase.nombre }}</ion-label>
-  <ion-button color="tertiary" (click)="marcarAsistencia(clase.id)">Marcar asistencia</ion-button>
-</ion-item>
 
-<br>
-<ion-button color="tertiary" expand="block" (click)="mostrarHistorial()">
-  Ver Historial de Asistencias
-</ion-button>
-</ion-content>
+  <ion-button (click)="iniciarEscaneo()">Escanear QR</ion-button>
+  
+  <zxing-scanner *ngIf="escaneando" (scanSuccess)="onCodeResult($event)"></zxing-scanner>
+  
+  <br>
+  <ion-item>
+    <ion-label position="stacked">Asignatura</ion-label>
+    <ion-input [(ngModel)]="asignaturaSeleccionada" placeholder="Ej: PGY4121"></ion-input>
+  </ion-item>
+  
+  <ion-item>
+    <ion-label position="stacked">Sección</ion-label>
+    <ion-input [(ngModel)]="seccionSeleccionada" placeholder="Ej: 001D"></ion-input>
+  </ion-item>
+  
+  <ion-item>
+    <ion-label position="stacked">Sala</ion-label>
+    <ion-input [(ngModel)]="salaSeleccionada" placeholder="Ej: L1"></ion-input>
+  </ion-item>
+
+  <br>
+  <ion-button color="tertiary" expand="block" (click)="guardarAsistencia()">Guardar Asistencia</ion-button>
+  
+  <br>
+  <ion-button color="tertiary" expand="block" (click)="mostrarHistorial()">
+    Ver Historial de Asistencias
+  </ion-button>
+
+  </ion-content>
 
 <ion-footer>
   <ion-toolbar color="primary">

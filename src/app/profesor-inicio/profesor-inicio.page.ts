@@ -55,9 +55,9 @@ if (currentUser) {
       day: '2-digit'
     }).replace(/[^0-9]/g, '');
 
-    const qrData = `${this.asignaturaSeleccionada}|${this.seccionSeleccionada}|${this.salaSeleccionada}|${fechaActual}`;
+    this.qrData = `${this.asignaturaSeleccionada}|${this.seccionSeleccionada}|${this.salaSeleccionada}|${fechaActual}`;
 
-  toDataURL(qrData, { errorCorrectionLevel: 'H' })
+  toDataURL(this.qrData, { errorCorrectionLevel: 'H' })
   .then((url: string) => {
     this.qrCodeUrl = url; 
     this.isModalOpen = true;
