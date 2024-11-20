@@ -8,30 +8,21 @@ export class AsistenciaService {
   constructor(private storage: Storage) {}
 
   // Guardar asistencia con la fecha y hora actual
-  async registrarAsistencia(claseId: string, usuarioId: string, nombreClase: string): Promise<void> {
-    const fechaHora = new Date();
-    const fechaHoraLocal = fechaHora.toLocaleString('es-CL', {
-        timeZone: 'America/Santiago', // Zona horaria de Chile
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit',
-        hour12: false // Formato de 24 horas
-    });
-    const asistencia = { claseId, usuarioId, nombreClase, fechaHora : fechaHoraLocal };
+  async registrarAsistencia(claseId: string, usuarioId: string, nombreClase: string, fechaQR: string): Promise<void> {
+    
+    const asistencia = { claseId, usuarioId, nombreClase, fechaQR };
 
     // Obtener las asistencias actuales
-    let asistencias = await this.storage.get('asistencias') || [];
+    let asistencias = await this.storage.get(`asistencias_${usuarioId}`) || [];
     asistencias.push(asistencia);
 
     // Guardar la lista actualizada de asistencias
-    await this.storage.set('asistencias', asistencias);
+    await this.storage.set(`asistencias_${usuarioId}`, asistencias);
+    console.log('Asistencia registrada para:',usuarioId, ':', asistencia);
   }
 
   // Obtener todas las asistencias registradas
-  async obtenerAsistencias(): Promise<any[]> {
-    return await this.storage.get('asistencias') || [];
+  async obtenerAsistencias(usuarioId: string): Promise<any[]> {
+    return await this.storage.get(`asistencias_${usuarioId}`) || [];
   }
 }
