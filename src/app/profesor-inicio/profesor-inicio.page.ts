@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { AlertController } from '@ionic/angular';
+import { AlertController, LoadingController } from '@ionic/angular';
 import { StorageService } from '../services/storage.service';
 import { toDataURL } from 'qrcode';
 
@@ -27,7 +27,7 @@ export class ProfesorInicioPage implements OnInit {
   secciones = ['001D', '002D', '003D', '004D', '001V', '002V', '003V'];
   salas = ['L1', 'L2', 'L3', 'L4', 'L5', 'L6', 'L7', 'L8', 'L9', 'L10'];
 
-  constructor(private alertController: AlertController, private storageService: StorageService) {}
+  constructor(private alertController: AlertController, private storageService: StorageService, private loadingController: LoadingController) {}
 
   async ngOnInit() {
     
@@ -49,27 +49,63 @@ if (currentUser) {
       return;
     }
 
-    const fechaActual = new Date().toLocaleDateString('es-CL', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit'
-    }).replace(/[^0-9]/g, '');
+    const confirmAlert = await this.alertController.create({
+      header: 'Confirmación',
+      message: `
+        ¿Estás seguro de que deseas generar el QR con los siguientes datos?
+        Clase: ${this.asignaturaSeleccionada}
+        Sección: ${this.seccionSeleccionada}
+        Sala: ${this.salaSeleccionada}
+      `,
+      buttons: [
+        {
+          text: 'No',
+          role: 'cancel',
+          handler: () => {
+            console.log('El profesor canceló la generación del QR.');
+          },
+        },
+        {
+          text: 'Sí',
+          handler: async () => {
+            const loading = await this.loadingController.create({
+              message: 'Generando el código QR...',
+            });
+            await loading.present();
 
-    this.qrData = `${this.asignaturaSeleccionada}|${this.seccionSeleccionada}|${this.salaSeleccionada}|${fechaActual}`;
+            try {
+              const fechaActual = new Date().toLocaleDateString('es-CL', {
+              year: 'numeric',
+              month: '2-digit',
+              day: '2-digit'
+              }).replace(/[^0-9]/g, '');
 
-  toDataURL(this.qrData, { errorCorrectionLevel: 'H' })
-  .then((url: string) => {
-    this.qrCodeUrl = url; 
-    this.isModalOpen = true;
-    console.log('Código QR generado:', this.qrCodeUrl);
-  })
-  .catch((err: any) => {
-    console.error('Error generando el código QR', err);
-  });
+              this.qrData = `${this.asignaturaSeleccionada}|${this.seccionSeleccionada}|${this.salaSeleccionada}|${fechaActual}`;
+
+              toDataURL(this.qrData, { errorCorrectionLevel: 'H' })
+                .then((url: string) => {
+                this.qrCodeUrl = url; 
+                this.isModalOpen = true;
+                console.log('Código QR generado:', this.qrCodeUrl);
+              })
+              .catch((err: any) => {
+              console.error('Error generando el código QR', err);
+              })
+              .finally(() => {
+                loading.dismiss();
+              });
+            } catch (error) {
+            console.error('Error al generar QR:', error);
+            loading.dismiss();
+            }
+          },
+        },
+      ],
+    });
+  await confirmAlert.present();
 }
 closeModal() {
   this.isModalOpen = false; 
 }
-
 }
 
