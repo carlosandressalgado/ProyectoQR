@@ -85,19 +85,47 @@ async registrarUsuario() {
       {
         text: 'Registrar',
         handler: async (data) => {
-          if (!data.nombre || !data.password) {
+          const nombre = data.nombre.trim();
+          const password = data.password.trim();
+          
+          if (!nombre || !password) {
             const errorAlert = await this.alertController.create({
               header: 'Error',
               message: 'Tienes que llenar todos los datos',
               buttons: ['Aceptar']
             });
             await errorAlert.present();
-            return;
+            return false;
+          }
+
+          if (!/^[a-zA-Z\s]{3,15}$/.test(nombre)) {
+            await this.mostrarError(
+              'El nombre debe tener entre 3 y 15 caracteres, solo letras y espacios.'
+            );
+            return false;
+          }
+
+          if (!/^(?=.*[a-zA-Z])(?=.*\d)[a-zA-Z\d]{6,20}$/.test(password)) {
+            await this.mostrarError(
+              'La contraseña debe tener entre 6 y 20 caracteres y al menos una letra y un número.'
+            );
+            return false;
           }
 
           const loading = await this.mostrarLoading('Registrando usuario...');
           try {
             let usuarios = await this.storageService.get('usuarios') || [];
+
+            const usuarioExistente = usuarios.find(
+              (u: any) => u.nombre.toLowerCase() === nombre.toLowerCase()
+            );
+            if (usuarioExistente) {
+              await this.mostrarError(
+                'El nombre de usuario ya está en uso. Elige otro.'
+              );
+              return false;
+            }
+
             usuarios.push({ nombre: data.nombre, password: data.password });
             await this.storageService.set('usuarios', usuarios);
 
@@ -110,12 +138,22 @@ async registrarUsuario() {
           } finally {
             loading.dismiss(); // Cierra el Loading al finalizar
           }
+          return true;
         }
       }
     ]
   });
 
   await alert.present();
+}
+
+private async mostrarError(mensaje: string) {
+  const errorAlert = await this.alertController.create({
+    header: 'Error',
+    message: mensaje,
+    buttons: ['Aceptar'],
+  });
+  await errorAlert.present();
 }
 
   // Función para mostrar alerta de "Inicio profesor"

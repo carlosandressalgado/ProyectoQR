@@ -3,8 +3,7 @@ import { StorageService } from '../services/storage.service';
 import { WeatherService } from '../services/weather.service';
 import { AsistenciaService } from '../services/asistencia.service';
 import { HistorialAsistenciasComponent } from '../historial-asistencias/historial-asistencias.component'; // Ajusta la ruta según la estructura
-import { ModalController } from '@ionic/angular';
-import { AlertController } from '@ionic/angular';
+import { ModalController, AlertController } from '@ionic/angular';
 
 
 @Component({
@@ -23,7 +22,9 @@ export class InicioPage implements OnInit {
   seccionSeleccionada: string = '';
   salaSeleccionada: string = '';
   fechaSeleccionada: string = ''; 
-
+  availableDevices: MediaDeviceInfo[] = [];
+  selectedDevice: MediaDeviceInfo | undefined = undefined;
+  
   constructor(private storageService: StorageService, private weatherService: WeatherService, private asistenciaService: AsistenciaService,
      private modalController: ModalController, private alertController: AlertController) { }
 
@@ -46,16 +47,27 @@ export class InicioPage implements OnInit {
         console.error('Error al obtener los datos del clima', error);
       }
     );
+
+    try {
+      const devices = await navigator.mediaDevices.enumerateDevices();
+      this.availableDevices = devices.filter(device => device.kind === 'videoinput');
+
+      this.selectedDevice =
+        this.availableDevices.find(device => device.label.toLowerCase().includes('back')) ||
+        this.availableDevices[0];
+    } catch (error) {
+      console.error('Error al obtener dispositivos de video:', error);
+    }
   }
   // Función para abrir el modal de historial de asistencias
   async mostrarHistorial() {
-    const currentUser = await this.storageService.get('currentUser');
-  
+  try {
+    const currentUser = await this.storageService.get('currentUser');  
     if (currentUser) {
       const asistencias = await this.asistenciaService.obtenerAsistencias(currentUser);
   
       console.log('Historial de asistencias para', currentUser, ':', asistencias);
-  
+   
       const modal = await this.modalController.create({
         component: HistorialAsistenciasComponent,
         componentProps: { asistencias, usuarioId: currentUser } 
@@ -64,51 +76,82 @@ export class InicioPage implements OnInit {
     } else {
       alert('No hay usuario logueado');
     }
+  }catch (error) {
+      console.error('Error al mostrar el historial:', error);
+    }
   }
+
 
   iniciarEscaneo() {
     this.escaneando = true; // Mostrar el escáner y activar la cámara
   }
 
   async onCodeResult(result: string) {
-    this.qrResult = result;
+    try {
+      this.qrResult = result; 
+      const [claseId, seccion, sala, fecha] = this.qrResult.split('|');
   
-    const [claseId, seccion, sala, fecha] = this.qrResult.split('|');
+      const dia = fecha.substring(0, 2);
+      const mes = fecha.substring(2, 4); 
+      const anio = fecha.substring(4, 8);
   
-    const dia = fecha.substring(0, 2);
-    const mes = fecha.substring(2, 4); 
-    const anio = fecha.substring(4, 8);
+      this.fechaSeleccionada = `${dia}/${mes}/${anio}`; 
   
-    this.fechaSeleccionada = `${dia}/${mes}/${anio}`; 
+      this.asignaturaSeleccionada = claseId; 
+      this.seccionSeleccionada = seccion;
+      this.salaSeleccionada = sala;
   
-    this.asignaturaSeleccionada = claseId; 
-    this.seccionSeleccionada = seccion;
-    this.salaSeleccionada = sala;
+      const usuarioId = this.nombreUsuario;
+      const nombreClase = `Clase: ${claseId}, Sección: ${seccion}, Sala: ${sala}`;
   
-    const usuarioId = this.nombreUsuario;
-    const nombreClase = `Clase: ${claseId}, Sección: ${seccion}, Sala: ${sala}`;
-  
-    await this.asistenciaService.registrarAsistencia(claseId, usuarioId, nombreClase, this.fechaSeleccionada);
-    console.log('Asistencia registrada para:', nombreClase);
-    this.escaneando = false; // Detener el escaneo
+      await this.asistenciaService.registrarAsistencia(claseId, usuarioId, nombreClase, this.fechaSeleccionada);
+      console.log('Asistencia registrada para:', nombreClase);
+    }catch (error) {
+    console.error('Error al procesar el código QR:', error);
+    }finally {
+    this.escaneando = false;
   }
+}
 
   async guardarAsistencia() {
     if (this.asignaturaSeleccionada && this.seccionSeleccionada && this.salaSeleccionada) {
       const usuarioId = this.nombreUsuario;
       const nombreClase = `Clase: ${this.asignaturaSeleccionada}, Sección: ${this.seccionSeleccionada}, Sala: ${this.salaSeleccionada}`;
       
-      const fecha = this.fechaSeleccionada || this.obtenerFechaActual(); 
-
-      await this.asistenciaService.registrarAsistencia(this.asignaturaSeleccionada, usuarioId, nombreClase, fecha);
-
+      const fecha = this.fechaSeleccionada || this.obtenerFechaActual();
+       
       const alert = await this.alertController.create({
-        header: 'Éxito',
-        message: '¡Asistencia guardada correctamente!',
-        buttons: ['Aceptar'],
+        header: 'Confirmar Asistencia',
+        message: `¿Está seguro de que desea guardar esta asistencia?
+        ${nombreClase}
+        Fecha: ${fecha}`,
+        buttons: [
+          {
+            text: 'No',
+            role: 'cancel',
+            handler: () => {
+              console.log('El usuario canceló el guardado de la asistencia.');
+            },
+          },
+          {
+            text: 'Sí',
+            handler: async () => {
+              await this.asistenciaService.registrarAsistencia(this.asignaturaSeleccionada, usuarioId, nombreClase, fecha);
+
+              const successAlert = await this.alertController.create({
+                header: 'Éxito',
+                message: '¡Asistencia guardada correctamente!',
+                buttons: ['Aceptar'],
+              });
+              await successAlert.present();
+
+              console.log('Asistencia guardada:', nombreClase, 'Fecha:', fecha);
+            },
+          },
+        ],
       });
+
       await alert.present();
-      console.log('Asistencia guardada:', nombreClase, 'Fecha:', fecha);
     } else {
       alert('Por favor, ingresa todos los datos manualmente o escanea un QR.');
     }

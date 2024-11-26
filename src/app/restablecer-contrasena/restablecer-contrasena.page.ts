@@ -1,8 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormControl, Validators, FormBuilder } from '@angular/forms';
-import { AlertController, NavController} from '@ionic/angular';
+import { AlertController, NavController, LoadingController} from '@ionic/angular';
 import { StorageService } from '../services/storage.service'; // Importar el servicio 
-import { Usuario } from '../usuario.interface'; // importar interfaz usuario
 
 
 @Component({
@@ -13,12 +12,16 @@ import { Usuario } from '../usuario.interface'; // importar interfaz usuario
 export class RestablecerContrasenaPage implements OnInit {
 
   formularioRecuperar: FormGroup;
+  nombreUsuario: string = '';
+  nuevaPassword: string = ''; 
+  confirmarPassword: string = '';
 
   constructor(
     public fb: FormBuilder,
     public alertController: AlertController,
     public navCtrl: NavController,
-    private storageService: StorageService // implementar para poder utilizar storage igual que en login.page.ts
+    private storageService: StorageService, // implementar para poder utilizar storage igual que en login.page.ts
+    private loadingController: LoadingController
   ) {
     this.formularioRecuperar = this.fb.group({
       'nombre': new FormControl("", Validators.required),
@@ -29,10 +32,13 @@ export class RestablecerContrasenaPage implements OnInit {
   ngOnInit() { }
 
   async cambiarContrasena() {
-    var f = this.formularioRecuperar.value;
+    const nombre = this.nombreUsuario.trim();
+    const nuevaPassword = this.nuevaPassword.trim();
+    const confirmarPassword = this.confirmarPassword.trim();
+    
 
     // Verificar que los campos no estén vacíos
-    if (this.formularioRecuperar.invalid) {
+    if (!nombre || !nuevaPassword || !confirmarPassword) {
       const alert = await this.alertController.create({
         header: 'Datos incompletos',
         message: 'Debes llenar todos los campos.',
@@ -42,38 +48,76 @@ export class RestablecerContrasenaPage implements OnInit {
       return;
     }
 
-    // Obtener la lista de usuarios
-    let usuarios: Usuario[] = await this.storageService.get('usuarios');
-    if (!usuarios) {
-      usuarios = []; // Inicializar vacío si no hay usuarios registrados
+    if (nuevaPassword !== confirmarPassword) {
+      await this.mostrarError('Las contraseñas no coinciden.');
+      return;
     }
 
-    // Buscar si el usuario existe en la lista de usuarios
-    const usuario = usuarios.find(u => u.nombre === f.nombre);
-
-    if (usuario) {
-      // Actualizar la contraseña del usuario
-      usuario.password = f.password;
-
-      // Guardar la lista de usuarios actualizada
-      await this.storageService.set('usuarios', usuarios);
-
-      const alert = await this.alertController.create({
-        header: 'Contraseña restablecida',
-        message: 'Tu contraseña ha sido actualizada exitosamente.',
-        buttons: ['Aceptar']
-      });
-      await alert.present();
-
-      //Volver ala página de login
-      this.navCtrl.navigateRoot('login');
-    } else {
-      const alert = await this.alertController.create({
-        header: 'Error',
-        message: 'Usuario no encontrado.',
-        buttons: ['Aceptar']
-      });
-      await alert.present();
+    if (!/^(?=.*[a-zA-Z])(?=.*\d)[a-zA-Z\d]{6,20}$/.test(nuevaPassword)) {
+      await this.mostrarError(
+        'La contraseña debe tener entre 6 y 20 caracteres y al menos una letra y un número.'
+      );
+      return;
     }
+
+    const confirmAlert = await this.alertController.create({
+      header: 'Confirmar Cambio',
+      message: `¿Estás seguro de que deseas cambiar la contraseña para el usuario: ${nombre}?`,
+      buttons: [
+        {
+          text: 'No',
+          role: 'cancel',
+          handler: () => {
+            console.log('Cambio de contraseña cancelado.');
+          }
+        },
+        {
+          text: 'Sí',
+          handler: async () => {
+            const loading = await this.loadingController.create({
+              message: 'Actualizando contraseña...',
+            });
+            await loading.present();
+
+            try {
+              let usuarios = await this.storageService.get('usuarios') || [];
+              const usuario = usuarios.find((u: any) => u.nombre.toLowerCase() === nombre.toLowerCase());
+
+              if (!usuario) {
+                await this.mostrarError('Usuario no encontrado.');
+                return;
+              }
+          
+              usuario.password = nuevaPassword;
+              await this.storageService.set('usuarios', usuarios);
+          
+              const successAlert = await this.alertController.create({
+                header: 'Éxito',
+                message: '¡Contraseña actualizada exitosamente!',
+                buttons: ['Aceptar'],
+              });
+              await successAlert.present();
+              console.log(`Contraseña cambiada para ${nombre}`);
+              this.navCtrl.navigateRoot('login');
+            } catch (error : any) {
+              await this.mostrarError(error.message || 'Error al actualizar la contraseña.');
+            } finally {
+              loading.dismiss();
+            }
+          },
+        },
+      ],
+    });
+    await confirmAlert.present();
+  }
+          
+
+  async mostrarError(mensaje: string) {
+    const alert = await this.alertController.create({
+      header: 'Error',
+      message: mensaje,
+      buttons: ['Aceptar']
+    });
+    await alert.present();
   }
 }
