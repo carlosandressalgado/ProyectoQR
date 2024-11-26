@@ -3,7 +3,7 @@ import { StorageService } from '../services/storage.service';
 import { WeatherService } from '../services/weather.service';
 import { AsistenciaService } from '../services/asistencia.service';
 import { HistorialAsistenciasComponent } from '../historial-asistencias/historial-asistencias.component'; // Ajusta la ruta según la estructura
-import { ModalController, AlertController } from '@ionic/angular';
+import { ModalController, AlertController, LoadingController } from '@ionic/angular';
 
 
 @Component({
@@ -26,7 +26,7 @@ export class InicioPage implements OnInit {
   selectedDevice: MediaDeviceInfo | undefined = undefined;
   
   constructor(private storageService: StorageService, private weatherService: WeatherService, private asistenciaService: AsistenciaService,
-     private modalController: ModalController, private alertController: AlertController) { }
+     private modalController: ModalController, private alertController: AlertController, private loadingController: LoadingController) { }
 
   async ngOnInit() {
     // Recuperar el nombre del usuario que inició sesión o el usuario actual
@@ -64,6 +64,11 @@ export class InicioPage implements OnInit {
   try {
     const currentUser = await this.storageService.get('currentUser');  
     if (currentUser) {
+      const loading = await this.loadingController.create({
+        message: 'Cargando historial de asistencias...',
+      });
+      await loading.present();
+
       const asistencias = await this.asistenciaService.obtenerAsistencias(currentUser);
   
       console.log('Historial de asistencias para', currentUser, ':', asistencias);
@@ -73,6 +78,7 @@ export class InicioPage implements OnInit {
         componentProps: { asistencias, usuarioId: currentUser } 
       });
       await modal.present();
+      loading.dismiss();
     } else {
       alert('No hay usuario logueado');
     }
