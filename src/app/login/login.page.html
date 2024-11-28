@@ -1,9 +1,14 @@
 <ion-header>
   <ion-toolbar color="primary">
-    <ion-title> RegistrAPP</ion-title>
-  </ion-toolbar>
+    <ion-title>RegistrAPP</ion-title>
+    <ion-buttons slot="end">
+      <ion-button>
+    <ion-img src="assets/images/logo_Duoc.png" alt="logo_Duoc"></ion-img>
+  </ion-button>
+</ion-buttons>
+</ion-toolbar>
 </ion-header>
-
+<br>
 <ion-content>
   <ion-card>
     <ion-card-header>
@@ -12,22 +17,18 @@
     <ion-card-content>
       <form [formGroup]="formularioLogin">
         <ion-item>
-          <ion-label position="floating">Nombre</ion-label>
+          <ion-label position="stacked" class="label-movido">Nombre</ion-label>
           <ion-input formControlName="nombre"></ion-input>
         </ion-item>
         <ion-item>
-          <ion-label position="floating">Contraseña</ion-label>
+          <ion-label position="stacked"class="label-movido2">Contraseña</ion-label>
           <ion-input formControlName="password" type="password"></ion-input>
         </ion-item>
       </form>
       <br>
-      <ion-button (click)="ingresar()">
-        Ingresar
-      </ion-button>
+      <ion-button class="ingresar" (click)="ingresar()">Ingresar</ion-button>
       <br>
-      <ion-button (click)="registrarUsuario()" fill="clear" color="primary">
-        Crea tu usuario
-      </ion-button>
+      <ion-button class="registrarUsuario" (click)="registrarUsuario()">registrar Usuario</ion-button>
     </ion-card-content>
   </ion-card>
 </ion-content>

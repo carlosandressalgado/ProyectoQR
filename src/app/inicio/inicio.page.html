@@ -25,10 +25,14 @@
 
 
   <ion-button (click)="iniciarEscaneo()">Escanear QR</ion-button>
+  <br><br>
+  <zxing-scanner *ngIf="escaneando" (scanSuccess)="onCodeResult($event)"></zxing-scanner><br>
   
-  <zxing-scanner *ngIf="escaneando" (scanSuccess)="onCodeResult($event)"></zxing-scanner>
-  
-  <br>
+  <ion-item lines="none" class="asistencia-item">
+    <ion-label>Registra tu Asistencia</ion-label>
+    <ion-img src="assets/images/asistencia.png" alt="asistencia" class="asistencia-icon"></ion-img>
+  </ion-item>
+
   <ion-item>
     <ion-label position="stacked">Asignatura</ion-label>
     <ion-input [(ngModel)]="asignaturaSeleccionada" placeholder="Ej: PGY4121"></ion-input>
@@ -45,10 +49,12 @@
   </ion-item>
 
   <br>
-  <ion-button color="tertiary" expand="block" (click)="guardarAsistencia()">Guardar Asistencia</ion-button>
+  <ion-button color="primary" expand="block" (click)="guardarAsistencia()">
+    Guardar Asistencia
+  </ion-button>
   
   <br>
-  <ion-button color="tertiary" expand="block" (click)="mostrarHistorial()">
+  <ion-button color="primary" expand="block" (click)="mostrarHistorial()">
     Ver Historial de Asistencias
   </ion-button>
 
