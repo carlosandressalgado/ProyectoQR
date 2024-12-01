@@ -1,44 +1,39 @@
 <ion-header>
-  <ion-toolbar color="primary">
-    <ion-title> RegistrAPP</ion-title>
+  <ion-toolbar>
+    <ion-title> <strong>RegistrAPP</strong></ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
-  <ion-card>
-    <ion-card-header>
-      <ion-card-title>Inicio de Sesión</ion-card-title>
-    </ion-card-header>
-    <ion-card-content>
+<ion-content class="ion-text-center login-container">
+  <div class="login-box">
+    <h2>Inicio de Sesión</h2>
       <form [formGroup]="formularioLogin">
-        <ion-item>
+        <ion-item class="input-item">
           <ion-label position="floating">Nombre</ion-label>
           <ion-input formControlName="nombre"></ion-input>
         </ion-item>
-        <ion-item>
+        <ion-item class="input-item">
           <ion-label position="floating">Contraseña</ion-label>
           <ion-input formControlName="password" type="password"></ion-input>
         </ion-item>
       </form>
-      <br>
-      <ion-button (click)="ingresar()">
+      <ion-button expand="block" (click)="ingresar()">
         Ingresar
       </ion-button>
       <br>
-      <ion-button (click)="registrarUsuario()" fill="clear" color="primary">
+      <ion-button expand="block" (click)="registrarUsuario()" fill="clear">
         Crea tu usuario
       </ion-button>
-    </ion-card-content>
-  </ion-card>
+  </div>
 </ion-content>
 
 <ion-footer>
-  <ion-toolbar color="primary">
+  <ion-toolbar>
     <ion-buttons slot="start">
       <ion-button (click)="mostrarMensajeInicioProfesor()">Inicio profesor</ion-button>
     </ion-buttons>
     <ion-buttons slot="end">
-      <ion-button [routerLink]="['/restablecer-contrasena']" expand="full">Olvidaste tu Contraseña?</ion-button>
+      <ion-button [routerLink]="['/restablecer-contrasena']">Olvidaste tu Contraseña?</ion-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-footer>

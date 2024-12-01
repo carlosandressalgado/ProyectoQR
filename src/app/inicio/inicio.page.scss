@@ -1,0 +1,70 @@
+.alumno-container {
+  --background: linear-gradient(180deg, #6a0dad, #9b5fd9, #e6dff3); /* Morado -> lila claro */
+}
+
+  .content-wrapper {
+    margin: 15% auto;
+    width: 90%;
+    max-width: 350px;
+    background: #ffffff;
+    padding: 20px;
+    border-radius: 15px;
+    text-align: center;
+    margin-top: 50px;
+  }
+  
+  .welcome-box {
+    text-align: center;
+    background: #6a0dad; 
+    color: white;
+    padding: 10px;
+    border-radius: 15px;
+    margin-bottom: 20px;
+  }
+  
+  .weather-card {
+    background: #f4f4f4;
+    color: #333333; 
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    margin-bottom: 20px;
+  }
+  
+  ion-button {
+    margin-top: 10px;
+    font-weight: bold;
+    --background: #6a0dad;
+    --color: white;
+  }
+  
+  ion-header ion-toolbar {
+    --background: #6a0dad; 
+    --color: white;
+    height: 60px;         
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  ion-footer ion-toolbar {
+    --background: #f4f4f4; /* Gris claro */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  ion-footer ion-button {
+    margin: 0 auto; /* Centra el botón dentro del footer */
+    font-weight: bold;
+    --background: rgba(255, 255, 255, 0.795);
+    border-radius: 8px;
+    padding: 8px 16px;
+  }
+  
+  ion-item {
+    --background: #f9f9f9;
+    --color: #333;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    padding: 5px 10px;
+  }

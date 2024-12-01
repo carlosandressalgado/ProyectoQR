@@ -1,20 +1,20 @@
 <ion-header>
-  <ion-toolbar color="primary">
-    <ion-title>Inicio</ion-title>
+  <ion-toolbar>
+    <ion-title><strong>Inicio</strong></ion-title>
   </ion-toolbar>
 </ion-header>
-<br>
 
-<ion-content class="ion-text-center">
+<ion-content class="alumno-container">
+  <div class="content-wrapper">
+    <div class="welcome-box">
   <!-- Mostrar el nombre del usuario -->
   <ion-label>Bienvenid&#64;, {{ nombreUsuario }}</ion-label>
-
-  <br><br>
+    </div>
 
   <!-- Mostrar la información del clima si está disponible -->
-  <ion-card *ngIf="weatherData">
+  <ion-card class="weather-card" *ngIf="weatherData">
     <ion-card-header>
-      <ion-card-title>Clima en {{ weatherData.name }}</ion-card-title>
+      <ion-card-title color="black">Clima en {{ weatherData.name }}</ion-card-title>
     </ion-card-header>
     <ion-card-content>
       <p>Temperatura: {{ weatherData.main.temp }}°C</p>
@@ -24,11 +24,10 @@
   </ion-card>
 
 
-  <ion-button (click)="iniciarEscaneo()">Escanear QR</ion-button>
+  <ion-button expand="block" (click)="iniciarEscaneo()">Escanear QR</ion-button>
   
   <zxing-scanner *ngIf="escaneando && selectedDevice"  [device]="selectedDevice" (scanSuccess)="onCodeResult($event)"></zxing-scanner>
   
-  <br>
   <ion-item>
     <ion-label position="stacked">Asignatura</ion-label>
     <ion-input [(ngModel)]="asignaturaSeleccionada" placeholder="Ej: PGY4121"></ion-input>
@@ -44,20 +43,16 @@
     <ion-input [(ngModel)]="salaSeleccionada" placeholder="Ej: L1"></ion-input>
   </ion-item>
 
-  <br>
-  <ion-button color="tertiary" expand="block" (click)="guardarAsistencia()">Guardar Asistencia</ion-button>
+  <ion-button expand="block" expand="block" (click)="guardarAsistencia()">Guardar Asistencia</ion-button>
   
-  <br>
-  <ion-button color="tertiary" expand="block" (click)="mostrarHistorial()">
+  <ion-button expand="block" expand="block" (click)="mostrarHistorial()">
     Ver Historial de Asistencias
   </ion-button>
-
+  </div>
   </ion-content>
 
 <ion-footer>
-  <ion-toolbar color="primary">
-    <ion-buttons slot="end">
-      <ion-button [routerLink]="['/login']" expand="full">Volver al inicio de sesión</ion-button>
-    </ion-buttons>
+  <ion-toolbar>
+    <ion-button [routerLink]="['/login']" expand="full">Volver al inicio de sesión</ion-button>
   </ion-toolbar>
 </ion-footer>

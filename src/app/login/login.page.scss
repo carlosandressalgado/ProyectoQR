@@ -1,0 +1,60 @@
+.login-container {
+    --background: linear-gradient(180deg, #6a0dad, #9b5fd9, #ffffff);
+  }
+  
+  .login-box {
+    margin: 15% auto;
+    width: 90%;
+    max-width: 350px;
+    background: #ffffff;
+    border-radius: 15px;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  }
+  
+  .login-box h2 {
+    font-size: 24px;
+    font-weight: bold;
+    color: #6a0dad;
+    margin-bottom: 20px;
+  }
+  
+  .input-item {
+    --background: #ffffff; 
+    --color: #000000; 
+    border: 1px solid #ccc; 
+    border-radius: 10px; 
+    margin-bottom: 15px;
+    padding: 5px 10px;
+  }
+  
+  ion-button {
+    margin-top: 10px;
+    --background: #6a0dad;
+    --color: white;
+  }
+  
+  ion-header ion-toolbar {
+    --background: #6a0dad; 
+    --color: white;
+    height: 60px;         
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  ion-footer ion-toolbar {
+    --background: #f4f4f4;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  ion-footer ion-button {
+    margin: 0 auto;
+    font-weight: bold;
+    --background: rgba(255, 255, 255, 0.151);
+    color: #000000;
+    border-radius: 8px;
+    padding: 8px 16px;
+  }

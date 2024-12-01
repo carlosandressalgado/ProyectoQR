@@ -1,52 +1,61 @@
-<ion-content class="ion-text-center">
-  <h1>Bienvenid&#64;, {{ nombreProfesor }}</h1>
+<ion-header>
+  <ion-toolbar>
+    <ion-title><strong>Inicio Profesor</strong></ion-title>
+  </ion-toolbar>
+</ion-header>
 
-  <ion-item>
-    <ion-label>Asignatura </ion-label>
-    <ion-select [(ngModel)]="asignaturaSeleccionada">
-      <ion-select-option *ngFor="let asignatura of asignaturas" [value]="asignatura.id">
-        {{ asignatura.nombre }}
-      </ion-select-option>
-    </ion-select>
-  </ion-item>
+<ion-content class="profesor-container">
+  <div class="profesor-box">
+    <h2>Bienvenid&#64;, {{ nombreProfesor }}</h2>
 
-  <ion-item>
-    <ion-label>Sección </ion-label>
-    <ion-select [(ngModel)]="seccionSeleccionada">
-      <ion-select-option *ngFor="let seccion of secciones" [value]="seccion">
-        {{ seccion }}
-      </ion-select-option>
-    </ion-select>
-  </ion-item>
+    <ion-item>
+      <ion-label position="floating">Asignatura </ion-label>
+      <ion-select [(ngModel)]="asignaturaSeleccionada">
+        <ion-select-option *ngFor="let asignatura of asignaturas" [value]="asignatura.id">
+          {{ asignatura.nombre }}
+        </ion-select-option>
+      </ion-select>
+    </ion-item>
 
-  <ion-item>
-    <ion-label>Sala </ion-label>
-    <ion-select [(ngModel)]="salaSeleccionada">
-      <ion-select-option *ngFor="let sala of salas" [value]="sala">
-        {{ sala }}
-      </ion-select-option>
-    </ion-select>
-  </ion-item>
+    <ion-item>
+      <ion-label position="floating">Sección </ion-label>
+      <ion-select [(ngModel)]="seccionSeleccionada">
+        <ion-select-option *ngFor="let seccion of secciones" [value]="seccion">
+          {{ seccion }}
+        </ion-select-option>
+      </ion-select>
+    </ion-item>
 
-  <br>
-  <ion-button expand="block" (click)="generarQR()">Generar Código QR</ion-button>
-  <ion-modal [isOpen]="isModalOpen" (ionModalDidDismiss)="closeModal()">
-    <ng-template>
-      <ion-content class="qr-modal-content">
-        <div class="qr-code-container">
-          <img [src]="qrCodeUrl" alt="Código QR" class="qr-code">
-        </div>
-        <p style="text-align: center; margin-top: 8px;">{{ qrData }}</p>
-        <ion-button (click)="closeModal()">Volver</ion-button>
-      </ion-content>
-    </ng-template>
-  </ion-modal>
+    <ion-item>
+      <ion-label position="floating">Sala </ion-label>
+      <ion-select [(ngModel)]="salaSeleccionada">
+        <ion-select-option *ngFor="let sala of salas" [value]="sala">
+          {{ sala }}
+        </ion-select-option>
+      </ion-select>
+    </ion-item>
+
+    <br>
+    <ion-button expand="block" (click)="generarQR()" class="btn-generar-qr">Generar Código QR</ion-button>
+
+    <ion-modal [isOpen]="isModalOpen" (ionModalDidDismiss)="closeModal()">
+      <ng-template>
+        <ion-content class="qr-modal-content">
+          <div class="qr-code-container">
+            <img [src]="qrCodeUrl" alt="Código QR" class="qr-code">
+          </div>
+          <p style="text-align: center; margin-top: 8px;">{{ qrData }}</p>
+          <ion-button (click)="closeModal()">Volver</ion-button>
+        </ion-content>
+      </ng-template>
+    </ion-modal>
+  </div>  
 </ion-content>
 
 <ion-footer>
-  <ion-toolbar color="primary">
-    <ion-buttons slot="end">
-      <ion-button [routerLink]="['/login']" expand="full">Salir</ion-button>
+  <ion-toolbar>
+    <ion-buttons>
+      <ion-button [routerLink]="['/login']" expand="full">Volver al inicio de sesión</ion-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-footer>
