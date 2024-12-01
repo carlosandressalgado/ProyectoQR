@@ -14,7 +14,7 @@
   <!-- Mostrar la información del clima si está disponible -->
   <ion-card class="weather-card" *ngIf="weatherData">
     <ion-card-header>
-      <ion-card-title color="black">Clima en {{ weatherData.name }}</ion-card-title>
+      <ion-card-title color="black"><strong> Clima en {{ weatherData.name }} </strong></ion-card-title>
     </ion-card-header>
     <ion-card-content>
       <p>Temperatura: {{ weatherData.main.temp }}°C</p>
