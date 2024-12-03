@@ -7,7 +7,6 @@ import { IonicModule } from '@ionic/angular';
 import { InicioPageRoutingModule } from './inicio-routing.module';
 
 import { InicioPage } from './inicio.page';
-import { ZXingScannerModule } from '@zxing/ngx-scanner'; 
 
 @NgModule({
   imports: [
@@ -15,7 +14,6 @@ import { ZXingScannerModule } from '@zxing/ngx-scanner';
     FormsModule,
     IonicModule,
     InicioPageRoutingModule,
-    ZXingScannerModule 
   ],
   declarations: [InicioPage]
 })

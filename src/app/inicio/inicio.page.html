@@ -29,7 +29,6 @@
 
   <ion-button expand="block" (click)="iniciarEscaneo()">Escanear QR</ion-button>
   
-  <zxing-scanner *ngIf="escaneando && selectedDevice"  [device]="selectedDevice" (scanSuccess)="onCodeResult($event)"></zxing-scanner>
   
   <ion-item>
     <ion-label position="stacked">Asignatura</ion-label>

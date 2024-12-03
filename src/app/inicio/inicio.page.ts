@@ -4,7 +4,7 @@ import { WeatherService } from '../services/weather.service';
 import { AsistenciaService } from '../services/asistencia.service';
 import { HistorialAsistenciasComponent } from '../historial-asistencias/historial-asistencias.component'; // Ajusta la ruta según la estructura
 import { ModalController, AlertController, LoadingController, NavController } from '@ionic/angular';
-
+import { QrScannerService } from '../services/qr-scanner.service'; 
 
 @Component({
   selector: 'app-inicio',
@@ -22,11 +22,9 @@ export class InicioPage implements OnInit {
   seccionSeleccionada: string = '';
   salaSeleccionada: string = '';
   fechaSeleccionada: string = ''; 
-  availableDevices: MediaDeviceInfo[] = [];
-  selectedDevice: MediaDeviceInfo | undefined = undefined;
   
   constructor(private storageService: StorageService, private weatherService: WeatherService, private asistenciaService: AsistenciaService,
-     private modalController: ModalController, private alertController: AlertController, private loadingController: LoadingController, public navCtrl: NavController,) { }
+     private modalController: ModalController, private alertController: AlertController, private loadingController: LoadingController, public navCtrl: NavController, private qrScannerService: QrScannerService) { }
 
   async ngOnInit() {
     // Recuperar el nombre del usuario que inició sesión o el usuario actual
@@ -48,16 +46,6 @@ export class InicioPage implements OnInit {
       }
     );
 
-    try {
-      const devices = await navigator.mediaDevices.enumerateDevices();
-      this.availableDevices = devices.filter(device => device.kind === 'videoinput');
-
-      this.selectedDevice =
-        this.availableDevices.find(device => device.label.toLowerCase().includes('back')) ||
-        this.availableDevices[0];
-    } catch (error) {
-      console.error('Error al obtener dispositivos de video:', error);
-    }
   }
   // Función para abrir el modal de historial de asistencias
   async mostrarHistorial() {
@@ -88,36 +76,39 @@ export class InicioPage implements OnInit {
   }
 
 
-  iniciarEscaneo() {
-    this.escaneando = true; // Mostrar el escáner y activar la cámara
-  }
+  async iniciarEscaneo() {
+    this.escaneando = true;
+    const barcodes = await this.qrScannerService.scan(); 
 
-  async onCodeResult(result: string) {
-    try {
-      this.qrResult = result; 
-      const [claseId, seccion, sala, fecha] = this.qrResult.split('|');
-  
+    if (barcodes.length > 0) {
+      const qrData = barcodes[0]; 
+      const [claseId, seccion, sala, fecha] = qrData.split('|'); 
+
       const dia = fecha.substring(0, 2);
       const mes = fecha.substring(2, 4); 
       const anio = fecha.substring(4, 8);
-  
-      this.fechaSeleccionada = `${dia}/${mes}/${anio}`; 
-  
+
+      this.fechaSeleccionada = `${dia}/${mes}/${anio}`;
       this.asignaturaSeleccionada = claseId; 
       this.seccionSeleccionada = seccion;
       this.salaSeleccionada = sala;
-  
+
       const usuarioId = this.nombreUsuario;
       const nombreClase = `Clase: ${claseId}, Sección: ${seccion}, Sala: ${sala}`;
-  
+
       await this.asistenciaService.registrarAsistencia(claseId, usuarioId, nombreClase, this.fechaSeleccionada);
       console.log('Asistencia registrada para:', nombreClase);
-    }catch (error) {
-    console.error('Error al procesar el código QR:', error);
-    }finally {
-    this.escaneando = false;
+    } else {
+      const errorAlert = await this.alertController.create({
+        header: 'Error',
+        message: 'No se detectó un código QR válido.',
+        buttons: ['Aceptar'],
+      });
+      await errorAlert.present();
+    }
+
+    this.escaneando = false; 
   }
-}
 
   async guardarAsistencia() {
     if (this.asignaturaSeleccionada && this.seccionSeleccionada && this.salaSeleccionada) {
