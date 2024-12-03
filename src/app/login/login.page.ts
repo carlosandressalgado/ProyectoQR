@@ -59,8 +59,8 @@ export class LoginPage implements OnInit {
         await this.storageService.set('currentUser', usuario.nombre);
         await this.storageService.set('tipoUsuario', 'alumno');
         this.router.navigateByUrl('/inicio');
-    console.log(await this.storageService.get('ingresado'));
-    console.log(await this.storageService.get('tipoUsuario'));  
+        console.log(await this.storageService.get('ingresado'));
+        console.log(await this.storageService.get('tipoUsuario'));  
   } else {
     const alert = await this.alertController.create({
       header: 'Datos incorrectos',

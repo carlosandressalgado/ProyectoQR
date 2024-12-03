@@ -3,7 +3,7 @@ import { StorageService } from '../services/storage.service';
 import { WeatherService } from '../services/weather.service';
 import { AsistenciaService } from '../services/asistencia.service';
 import { HistorialAsistenciasComponent } from '../historial-asistencias/historial-asistencias.component'; // Ajusta la ruta según la estructura
-import { ModalController, AlertController, LoadingController } from '@ionic/angular';
+import { ModalController, AlertController, LoadingController, NavController } from '@ionic/angular';
 
 
 @Component({
@@ -26,7 +26,7 @@ export class InicioPage implements OnInit {
   selectedDevice: MediaDeviceInfo | undefined = undefined;
   
   constructor(private storageService: StorageService, private weatherService: WeatherService, private asistenciaService: AsistenciaService,
-     private modalController: ModalController, private alertController: AlertController, private loadingController: LoadingController) { }
+     private modalController: ModalController, private alertController: AlertController, private loadingController: LoadingController, public navCtrl: NavController,) { }
 
   async ngOnInit() {
     // Recuperar el nombre del usuario que inició sesión o el usuario actual
@@ -174,4 +174,44 @@ export class InicioPage implements OnInit {
   
     return fechaFormateada;
   }
+
+  async salir() {
+    const confirmalert = await this.alertController.create({
+      header: 'Cerrar Sesión',
+      message: '¿Está seguro de que desea cerrar sesión y volver al inicio de sesión?',
+      buttons: [
+        {
+          text: 'Cancelar',
+          role: 'cancel',
+          handler: () => {
+            console.log('El usuario canceló cerrar sesión.');
+          },
+        },
+        {
+          text: 'Cerrar Sesión',
+          handler: async () => {
+            const loading = await this.loadingController.create({
+              message: 'Cerrando sesión...',
+            });
+            await loading.present();
+
+            try {
+              // Limpiar el almacenamiento del usuario actual
+              await this.storageService.remove('currentUser');
+            
+              console.log('El usuario ha cerrado sesión.');
+            }catch (error) {
+              console.error('Error al cerrar la sesión:', error);
+            } finally {
+              await loading.dismiss();
+              this.navCtrl.navigateRoot('/login');
+            }
+          },
+        },
+      ],
+    });
+  
+    await confirmalert.present();
+  }
+
 }

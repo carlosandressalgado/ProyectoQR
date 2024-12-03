@@ -1,0 +1,57 @@
+.restablecer-container {
+    --background: linear-gradient(180deg, #4169E1, #87CEEB, #F0F8FF); 
+  }
+
+  .restablecer-box {
+    margin: 15% auto;
+    width: 90%;
+    max-width: 350px;
+    background: #F0F8FF;
+    padding: 20px;
+    border-radius: 15px;
+    text-align: center;
+    margin-top: 50px;
+  }
+
+  ion-item {
+    --background: #f9f9f9;
+    --color: #333;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    padding: 5px 10px;
+  }
+
+  .btn-restablecer {
+    margin-top: 20px;
+    font-weight: bold;
+    --background: #4169E1;
+    --color: white;
+    border-radius: 8px;
+    width: 100%;
+    padding: 12px;
+  }
+
+  ion-header ion-toolbar {
+    --background: #4169E1; 
+    --color: white;
+    height: 60px;         
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  ion-footer ion-toolbar {
+    --background: #f4f4f4;
+    --color: black;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  ion-footer ion-button {
+    margin: 0 auto; /* Centra el botón dentro del footer */
+    font-weight: bold;
+    --background: rgba(255, 255, 255, 0.795);
+    border-radius: 8px;
+    padding: 8px 16px;
+  }

@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { AlertController, LoadingController } from '@ionic/angular';
+import { AlertController, LoadingController, NavController } from '@ionic/angular';
 import { StorageService } from '../services/storage.service';
 import { toDataURL } from 'qrcode';
 
@@ -27,7 +27,7 @@ export class ProfesorInicioPage implements OnInit {
   secciones = ['001D', '002D', '003D', '004D', '001V', '002V', '003V'];
   salas = ['L1', 'L2', 'L3', 'L4', 'L5', 'L6', 'L7', 'L8', 'L9', 'L10'];
 
-  constructor(private alertController: AlertController, private storageService: StorageService, private loadingController: LoadingController) {}
+  constructor(private alertController: AlertController, private storageService: StorageService, private loadingController: LoadingController, private navCtrl: NavController) {}
 
   async ngOnInit() {
     
@@ -95,17 +95,56 @@ if (currentUser) {
                 loading.dismiss();
               });
             } catch (error) {
-            console.error('Error al generar QR:', error);
-            loading.dismiss();
-            }
+              console.error('Error al generar QR:', error);
+              loading.dismiss();
+              }
+            },
           },
+        ],
+      });
+    await confirmAlert.present();
+  }
+
+  closeModal() {
+  this.isModalOpen = false; 
+  }
+
+  async confirmarSalir() {
+    const confirmalert = await this.alertController.create({
+      header: 'Cerrar Sesión',
+      message: '¿Está seguro de que desea volver al inicio de sesión?',
+      buttons: [
+        {
+          text: 'Cancelar',
+          role: 'cancel',
+          handler: () => {
+            console.log('El usuario decidió quedarse en la página.');
+          },
+        },
+        {
+          text: 'Aceptar',
+          handler: async () => {
+            const loading = await this.loadingController.create({
+              message: 'Cerrando sesión...',
+            });
+            await loading.present();
+
+            try {
+              await this.storageService.remove('currentUser');
+  
+              console.log('El usuario ha cerrado sesión.');
+            }catch (error) {
+                console.error('Error al cerrar la sesión:', error);
+            } finally {
+              await loading.dismiss();
+              this.navCtrl.navigateRoot('/login');
+            }
+          },  
         },
       ],
     });
-  await confirmAlert.present();
-}
-closeModal() {
-  this.isModalOpen = false; 
-}
+  
+    await confirmalert.present();
+  }
 }
 
