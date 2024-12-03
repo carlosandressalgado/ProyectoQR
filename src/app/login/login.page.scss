@@ -1,12 +1,12 @@
 .login-container {
-    --background: linear-gradient(180deg, #6a0dad, #9b5fd9, #ffffff);
+    --background: linear-gradient(180deg, #4169E1, #87CEEB, #F0F8FF);
   }
   
   .login-box {
     margin: 15% auto;
     width: 90%;
     max-width: 350px;
-    background: #ffffff;
+    background: #F0F8FF;
     border-radius: 15px;
     padding: 20px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
@@ -15,13 +15,13 @@
   .login-box h2 {
     font-size: 24px;
     font-weight: bold;
-    color: #6a0dad;
+    color: #001F3F;
     margin-bottom: 20px;
   }
   
   .input-item {
     --background: #ffffff; 
-    --color: #000000; 
+    --color: #001F3F; 
     border: 1px solid #ccc; 
     border-radius: 10px; 
     margin-bottom: 15px;
@@ -30,17 +30,25 @@
   
   ion-button {
     margin-top: 10px;
-    --background: #6a0dad;
+    --background: #4169E1;
     --color: white;
   }
   
   ion-header ion-toolbar {
-    --background: #6a0dad; 
+    --background: #4169E1; 
     --color: white;
     height: 60px;         
     display: flex;
-    justify-content: center;
+    justify-content: space-between;
     align-items: center;
+    padding: 0 16px;
+  }
+
+  .header-image {
+    width: 100px;  
+    height: auto; 
+    max-width: 100%; 
+    object-fit: contain;
   }
 
   ion-footer ion-toolbar {

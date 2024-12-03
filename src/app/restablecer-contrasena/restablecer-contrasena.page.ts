@@ -120,10 +120,5 @@ export class RestablecerContrasenaPage implements OnInit {
     });
     await alert.present();
   }
-
-  volver() {
-    // Navegar a la página anterior o a una específica si no hay historial
-    this.navCtrl.navigateBack('/login'); // Ajusta '/login' a tu ruta deseada
-  }
 }
 

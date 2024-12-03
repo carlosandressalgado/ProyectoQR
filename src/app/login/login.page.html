@@ -1,6 +1,9 @@
 <ion-header>
   <ion-toolbar>
     <ion-title> <strong>RegistrAPP</strong></ion-title>
+    <ion-buttons slot="end">
+      <img src="assets/images/duocuc.png" alt="Icono" class="header-image" />
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
@@ -11,10 +14,12 @@
         <ion-item class="input-item">
           <ion-label position="floating">Nombre</ion-label>
           <ion-input formControlName="nombre"></ion-input>
+          <ion-icon name="person" slot="end" color="primary"></ion-icon>
         </ion-item>
         <ion-item class="input-item">
           <ion-label position="floating">Contraseña</ion-label>
           <ion-input formControlName="password" type="password"></ion-input>
+          <ion-icon name="lock-closed" slot="end" color="primary"></ion-icon>
         </ion-item>
       </form>
       <ion-button expand="block" (click)="ingresar()">

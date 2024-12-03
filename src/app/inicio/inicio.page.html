@@ -1,6 +1,9 @@
 <ion-header>
   <ion-toolbar>
-    <ion-title><strong>Inicio</strong></ion-title>
+    <ion-title><strong>Inicio Alumnos</strong></ion-title>
+    <ion-buttons slot="end">
+      <img src="assets/images/alumno_animado.png" alt="Icono" class="header-image" />
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
@@ -53,6 +56,6 @@
 
 <ion-footer>
   <ion-toolbar>
-    <ion-button [routerLink]="['/login']" expand="full">Volver al inicio de sesión</ion-button>
+    <ion-button (click)="salir()" expand="full">Volver al inicio de sesión</ion-button>
   </ion-toolbar>
 </ion-footer>

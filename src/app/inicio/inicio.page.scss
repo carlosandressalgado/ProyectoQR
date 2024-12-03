@@ -1,12 +1,12 @@
 .alumno-container {
-  --background: linear-gradient(180deg, #6a0dad, #9b5fd9, #e6dff3); /* Morado -> lila claro */
+  --background: linear-gradient(180deg, #4169E1, #87CEEB, #F0F8FF);
 }
 
   .content-wrapper {
     margin: 15% auto;
     width: 90%;
     max-width: 350px;
-    background: #ffffff;
+    background: #F0F8FF;
     padding: 20px;
     border-radius: 15px;
     text-align: center;
@@ -15,7 +15,7 @@
   
   .welcome-box {
     text-align: center;
-    background: #6a0dad; 
+    background: #4169E1; 
     color: white;
     padding: 10px;
     border-radius: 15px;
@@ -33,12 +33,12 @@
   ion-button {
     margin-top: 10px;
     font-weight: bold;
-    --background: #6a0dad;
+    --background: #4169E1;
     --color: white;
   }
   
   ion-header ion-toolbar {
-    --background: #6a0dad; 
+    --background: #4169E1; 
     --color: white;
     height: 60px;         
     display: flex;
@@ -46,15 +46,22 @@
     align-items: center;
   }
   
+  .header-image {
+    width: 50px;  
+    height: auto; 
+    max-width: 100%; 
+    object-fit: contain;
+  }
+
   ion-footer ion-toolbar {
-    --background: #f4f4f4; /* Gris claro */
+    --background: #f4f4f4;
     display: flex;
     justify-content: center;
     align-items: center;
   }
 
   ion-footer ion-button {
-    margin: 0 auto; /* Centra el botón dentro del footer */
+    margin: 0 auto; 
     font-weight: bold;
     --background: rgba(255, 255, 255, 0.795);
     border-radius: 8px;
