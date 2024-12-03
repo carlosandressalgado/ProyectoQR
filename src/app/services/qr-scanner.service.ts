@@ -35,7 +35,7 @@ export class QrScannerService {
     }
   }
 
-  private async requestPermissions(): Promise<boolean> {
+  public async requestPermissions(): Promise<boolean> {
     const { camera } = await BarcodeScanner.requestPermissions();
     return camera === 'granted' || camera === 'limited';
   }

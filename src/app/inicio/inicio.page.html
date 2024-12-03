@@ -27,7 +27,11 @@
   </ion-card>
 
 
-  <ion-button expand="block" (click)="iniciarEscaneo()">Escanear QR</ion-button>
+  <ion-fab slot="fixed" vertical="bottom" horizontal="end">
+    <ion-fab-button (click)="iniciarEscaneo()">
+      <ion-icon name="qr-code-outline"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
   
   
   <ion-item>

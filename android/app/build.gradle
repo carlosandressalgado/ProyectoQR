@@ -1,4 +1,5 @@
 apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
 
 android {
     namespace "io.ionic.starter"
@@ -21,6 +22,10 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
+    }
+    // Configuración para Kotlin
+    kotlinOptions {
+        jvmTarget = "17"  // Asegura que Kotlin compile con Java 17
     }
 }
 
@@ -51,22 +56,4 @@ try {
     }
 } catch(Exception e) {
     logger.info("google-services.json not found, google-services plugin not applied. Push Notifications won't work")
-}
-
-allprojects {
-    repositories {
-        google()
-        mavenCentral()
-        maven {
-            url 'https://pkgs.dev.azure.com/OutSystemsRD/9e79bc5b-69b2-4476-9ca5-d67594972a52/_packaging/PublicArtifactRepository/maven/v1'
-            name 'Azure'
-            credentials {
-                username = "optional"
-                password = ""
-            }
-            content {
-                includeGroup "com.github.outsystems"
-            }
-        }
-    }
 }

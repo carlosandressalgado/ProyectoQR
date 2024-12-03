@@ -75,27 +75,40 @@ export class InicioPage implements OnInit {
     }
   }
 
-
   async iniciarEscaneo() {
     this.escaneando = true;
-    const barcodes = await this.qrScannerService.scan(); 
-
+    
+    // Verificar permisos antes de intentar escanear
+    const hasPermission = await this.qrScannerService.requestPermissions();
+    if (!hasPermission) {
+      const alert = await this.alertController.create({
+        header: 'Permisos necesarios',
+        message: 'Se requiere acceso a la cámara para escanear el código QR.',
+        buttons: ['Aceptar']
+      });
+      await alert.present();
+      this.escaneando = false;
+      return;
+    }
+    
+    // Iniciar el escaneo
+    const barcodes = await this.qrScannerService.scan();
+    
     if (barcodes.length > 0) {
-      const qrData = barcodes[0]; 
-      const [claseId, seccion, sala, fecha] = qrData.split('|'); 
-
+      const qrData = barcodes[0];
+      const [claseId, seccion, sala, fecha] = qrData.split('|');
       const dia = fecha.substring(0, 2);
       const mes = fecha.substring(2, 4); 
       const anio = fecha.substring(4, 8);
-
+      
       this.fechaSeleccionada = `${dia}/${mes}/${anio}`;
-      this.asignaturaSeleccionada = claseId; 
+      this.asignaturaSeleccionada = claseId;
       this.seccionSeleccionada = seccion;
       this.salaSeleccionada = sala;
 
       const usuarioId = this.nombreUsuario;
       const nombreClase = `Clase: ${claseId}, Sección: ${seccion}, Sala: ${sala}`;
-
+      
       await this.asistenciaService.registrarAsistencia(claseId, usuarioId, nombreClase, this.fechaSeleccionada);
       console.log('Asistencia registrada para:', nombreClase);
     } else {
@@ -106,8 +119,8 @@ export class InicioPage implements OnInit {
       });
       await errorAlert.present();
     }
-
-    this.escaneando = false; 
+    
+    this.escaneando = false;
   }
 
   async guardarAsistencia() {
