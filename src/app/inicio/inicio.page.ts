@@ -60,10 +60,10 @@ export class InicioPage implements OnInit {
       const asistencias = await this.asistenciaService.obtenerAsistencias(currentUser);
   
       console.log('Historial de asistencias para', currentUser, ':', asistencias);
-   
+
       const modal = await this.modalController.create({
         component: HistorialAsistenciasComponent,
-        componentProps: { asistencias, usuarioId: currentUser } 
+        componentProps: { usuarioId: currentUser } 
       });
       await modal.present();
       loading.dismiss();
@@ -101,7 +101,7 @@ export class InicioPage implements OnInit {
       const mes = fecha.substring(2, 4); 
       const anio = fecha.substring(4, 8);
       
-      this.fechaSeleccionada = `${dia}/${mes}/${anio}`;
+      this.fechaSeleccionada = `${anio}/${mes}/${dia}`;
       this.asignaturaSeleccionada = claseId;
       this.seccionSeleccionada = seccion;
       this.salaSeleccionada = sala;
@@ -124,12 +124,42 @@ export class InicioPage implements OnInit {
   }
 
   async guardarAsistencia() {
+    const asignaturasValidas = ['PGY4121', 'ASY4131', 'CSY4111'];
+    if (!asignaturasValidas.includes(this.asignaturaSeleccionada)) {
+      const errorAlert = await this.alertController.create({
+        header: 'Asignatura inválida',
+        message: `La asignatura ${this.asignaturaSeleccionada} no está permitida para registrar asistencia.`,
+        buttons: ['Aceptar'],
+      });
+      await errorAlert.present();
+      return;
+    }
+
     if (this.asignaturaSeleccionada && this.seccionSeleccionada && this.salaSeleccionada) {
       const usuarioId = this.nombreUsuario;
       const nombreClase = `Clase: ${this.asignaturaSeleccionada}, Sección: ${this.seccionSeleccionada}, Sala: ${this.salaSeleccionada}`;
       
       const fecha = this.fechaSeleccionada || this.obtenerFechaActual();
-       
+      
+      try {
+        const asistencias = await this.asistenciaService.obtenerAsistencias(usuarioId);
+  
+        // Validar si la asistencia ya existe
+        const existeAsistencia = asistencias.some(
+          (asistencia: any) =>
+            asistencia.claseId === this.asignaturaSeleccionada && asistencia.fechaQR === fecha
+        );
+  
+        if (existeAsistencia) {
+          const duplicadoAlert = await this.alertController.create({
+            header: 'Asistencia Duplicada',
+            message: 'Ya existe una asistencia registrada para esta asignatura en la fecha indicada.',
+            buttons: ['Aceptar'],
+          });
+          await duplicadoAlert.present();
+          return;
+        }
+      
       const alert = await this.alertController.create({
         header: 'Confirmar Asistencia',
         message: `¿Está seguro de que desea guardar esta asistencia?
@@ -162,21 +192,28 @@ export class InicioPage implements OnInit {
       });
 
       await alert.present();
+    } catch (error) {
+      console.error('Error al guardar la asistencia:', error);
+      const errorAlert = await this.alertController.create({
+        header: 'Error',
+        message: 'Hubo un error al intentar guardar la asistencia. Intenta nuevamente.',
+        buttons: ['Aceptar'],
+      });
+      await errorAlert.present();
+    }
     } else {
       alert('Por favor, ingresa todos los datos manualmente o escanea un QR.');
     }
   }
+
   obtenerFechaActual(): string {
     const fecha = new Date();
   
-    const fechaFormateada = fecha.toLocaleDateString('es-CL', {
-      timeZone: 'America/Santiago',
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit'
-    });
+    const anio = fecha.getFullYear();
+    const mes = String(fecha.getMonth() + 1).padStart(2, '0'); // Los meses van de 0 a 11
+    const dia = String(fecha.getDate()).padStart(2, '0');
   
-    return fechaFormateada;
+    return `${anio}-${mes}-${dia}`;
   }
 
   async salir() {
