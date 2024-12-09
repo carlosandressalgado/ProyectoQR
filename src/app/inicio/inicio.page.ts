@@ -4,7 +4,7 @@ import { WeatherService } from '../services/weather.service';
 import { AsistenciaService } from '../services/asistencia.service';
 import { HistorialAsistenciasComponent } from '../historial-asistencias/historial-asistencias.component'; // Ajusta la ruta según la estructura
 import { ModalController, AlertController, LoadingController, NavController } from '@ionic/angular';
-
+import { QrScannerService } from '../services/qr-scanner.service'; 
 
 @Component({
   selector: 'app-inicio',
@@ -22,11 +22,9 @@ export class InicioPage implements OnInit {
   seccionSeleccionada: string = '';
   salaSeleccionada: string = '';
   fechaSeleccionada: string = ''; 
-  availableDevices: MediaDeviceInfo[] = [];
-  selectedDevice: MediaDeviceInfo | undefined = undefined;
   
   constructor(private storageService: StorageService, private weatherService: WeatherService, private asistenciaService: AsistenciaService,
-     private modalController: ModalController, private alertController: AlertController, private loadingController: LoadingController, public navCtrl: NavController,) { }
+     private modalController: ModalController, private alertController: AlertController, private loadingController: LoadingController, public navCtrl: NavController, private readonly qrScannerService: QrScannerService) { }
 
   async ngOnInit() {
     // Recuperar el nombre del usuario que inició sesión o el usuario actual
@@ -48,16 +46,6 @@ export class InicioPage implements OnInit {
       }
     );
 
-    try {
-      const devices = await navigator.mediaDevices.enumerateDevices();
-      this.availableDevices = devices.filter(device => device.kind === 'videoinput');
-
-      this.selectedDevice =
-        this.availableDevices.find(device => device.label.toLowerCase().includes('back')) ||
-        this.availableDevices[0];
-    } catch (error) {
-      console.error('Error al obtener dispositivos de video:', error);
-    }
   }
   // Función para abrir el modal de historial de asistencias
   async mostrarHistorial() {
@@ -88,44 +76,152 @@ export class InicioPage implements OnInit {
   }
 
 
-  iniciarEscaneo() {
-    this.escaneando = true; // Mostrar el escáner y activar la cámara
-  }
-
-  async onCodeResult(result: string) {
+  async iniciarEscaneo() {
     try {
-      this.qrResult = result; 
-      const [claseId, seccion, sala, fecha] = this.qrResult.split('|');
+      const barcodes = await this.qrScannerService.scan();
   
-      const dia = fecha.substring(0, 2);
-      const mes = fecha.substring(2, 4); 
-      const anio = fecha.substring(4, 8);
+      if (barcodes.length === 0) {
+        const errorAlert = await this.alertController.create({
+          header: 'Error',
+          message: 'No se detectó un código QR válido.',
+          buttons: ['Aceptar'],
+        });
+        await errorAlert.present();
+        return;
+      }
   
-      this.fechaSeleccionada = `${dia}/${mes}/${anio}`; 
+      const qrData = barcodes[0];
+      const qrPattern = /^([A-Z0-9]+)\|([A-Z0-9]+)\|([A-Z0-9]+)\|(\d{8})$/; // Formato esperado
+      const match = qrData.match(qrPattern);
   
-      this.asignaturaSeleccionada = claseId; 
-      this.seccionSeleccionada = seccion;
-      this.salaSeleccionada = sala;
+      if (!match) {
+        const errorAlert = await this.alertController.create({
+          header: 'Error',
+          message: 'El código QR escaneado no tiene el formato válido.',
+          buttons: ['Aceptar'],
+        });
+        await errorAlert.present();
+        return;
+      }
+  
+      const [_, claseId, seccion, sala, fecha] = match;
+  
+      const asignaturasValidas = ['PGY4121', 'ASY4131', 'CSY4111'];
+      if (!asignaturasValidas.includes(claseId)) {
+        const errorAlert = await this.alertController.create({
+          header: 'Asignatura inválida',
+          message: `La asignatura ${claseId} no está permitida para registrar asistencia.`,
+          buttons: ['Aceptar'],
+        });
+        await errorAlert.present();
+        return;
+      }
+  
+      // Convertir la fecha al formato requerido
+      const anio = fecha.substring(0, 4);
+      const mes = fecha.substring(4, 6);
+      const dia = fecha.substring(6, 8);
+      const fechaFormateada = `${anio}-${mes}-${dia}`;
   
       const usuarioId = this.nombreUsuario;
       const nombreClase = `Clase: ${claseId}, Sección: ${seccion}, Sala: ${sala}`;
+      const asistencias = await this.asistenciaService.obtenerAsistencias(usuarioId);
   
-      await this.asistenciaService.registrarAsistencia(claseId, usuarioId, nombreClase, this.fechaSeleccionada);
-      console.log('Asistencia registrada para:', nombreClase);
-    }catch (error) {
-    console.error('Error al procesar el código QR:', error);
-    }finally {
-    this.escaneando = false;
+      const existeAsistencia = asistencias.some(
+        (asistencia: any) =>
+          asistencia.claseId === claseId && asistencia.fechaQR === fechaFormateada
+      );
+  
+      if (existeAsistencia) {
+        const duplicadoAlert = await this.alertController.create({
+          header: 'Asistencia Duplicada',
+          message: 'Ya existe una asistencia registrada para esta asignatura en la fecha indicada.',
+          buttons: ['Aceptar'],
+        });
+        await duplicadoAlert.present();
+        return;
+      }
+  
+      const confirmAlert = await this.alertController.create({
+        header: 'Confirmar Asistencia',
+        message: `
+          ¿Está seguro de que desea registrar la asistencia con los siguientes datos?
+          ${nombreClase}
+          Fecha: ${fechaFormateada}
+        `,
+        buttons: [
+          {
+            text: 'No',
+            role: 'cancel',
+            handler: () => {
+              console.log('Registro cancelado.');
+            },
+          },
+          {
+            text: 'Sí',
+            handler: async () => {
+              await this.asistenciaService.registrarAsistencia(claseId, usuarioId, nombreClase, fechaFormateada);
+              const successAlert = await this.alertController.create({
+                header: 'Éxito',
+                message: '¡Asistencia registrada correctamente!',
+                buttons: ['Aceptar'],
+              });
+              await successAlert.present();
+              console.log('Asistencia registrada:', nombreClase, fechaFormateada);
+            },
+          },
+        ],
+      });
+  
+      await confirmAlert.present();
+    } catch (error) {
+      console.error('Error al escanear el QR:', error);
+      const errorAlert = await this.alertController.create({
+        header: 'Error',
+        message: 'Ocurrió un error al intentar escanear el QR. Por favor, intenta nuevamente.',
+        buttons: ['Aceptar'],
+      });
+      await errorAlert.present();
+    }
   }
-}
 
   async guardarAsistencia() {
+    const asignaturasValidas = ['PGY4121', 'ASY4131', 'CSY4111'];
+    if (!asignaturasValidas.includes(this.asignaturaSeleccionada)) {
+      const errorAlert = await this.alertController.create({
+        header: 'Asignatura inválida',
+        message: `La asignatura ${this.asignaturaSeleccionada} no está permitida para registrar asistencia.`,
+        buttons: ['Aceptar'],
+      });
+      await errorAlert.present();
+      return;
+    }
+
+    
     if (this.asignaturaSeleccionada && this.seccionSeleccionada && this.salaSeleccionada) {
       const usuarioId = this.nombreUsuario;
       const nombreClase = `Clase: ${this.asignaturaSeleccionada}, Sección: ${this.seccionSeleccionada}, Sala: ${this.salaSeleccionada}`;
       
       const fecha = this.fechaSeleccionada || this.obtenerFechaActual();
        
+      try {
+        const asistencias = await this.asistenciaService.obtenerAsistencias(usuarioId);
+  
+        const existeAsistencia = asistencias.some(
+          (asistencia: any) =>
+            asistencia.claseId === this.asignaturaSeleccionada && asistencia.fechaQR === fecha
+        );
+  
+        if (existeAsistencia) {
+          const duplicadoAlert = await this.alertController.create({
+            header: 'Asistencia Duplicada',
+            message: 'Ya existe una asistencia registrada para esta asignatura en la fecha indicada.',
+            buttons: ['Aceptar'],
+          });
+          await duplicadoAlert.present();
+          return;
+        }
+
       const alert = await this.alertController.create({
         header: 'Confirmar Asistencia',
         message: `¿Está seguro de que desea guardar esta asistencia?
@@ -156,23 +252,29 @@ export class InicioPage implements OnInit {
           },
         ],
       });
-
       await alert.present();
-    } else {
+    } catch (error) {
+      console.error('Error al guardar la asistencia:', error);
+      const errorAlert = await this.alertController.create({
+        header: 'Error',
+        message: 'Hubo un error al intentar guardar la asistencia. Intenta nuevamente.',
+        buttons: ['Aceptar'],
+      });
+      await errorAlert.present();
+    }
+    }else {
       alert('Por favor, ingresa todos los datos manualmente o escanea un QR.');
     }
   }
+
   obtenerFechaActual(): string {
     const fecha = new Date();
   
-    const fechaFormateada = fecha.toLocaleDateString('es-CL', {
-      timeZone: 'America/Santiago',
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit'
-    });
+    const anio = fecha.getFullYear();
+    const mes = String(fecha.getMonth() + 1).padStart(2, '0'); 
+    const dia = String(fecha.getDate()).padStart(2, '0');
   
-    return fechaFormateada;
+    return `${anio}-${mes}-${dia}`;
   }
 
   async salir() {

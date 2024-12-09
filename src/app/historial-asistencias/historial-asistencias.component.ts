@@ -8,8 +8,8 @@ import { ModalController } from '@ionic/angular';
   styleUrls: ['./historial-asistencias.component.scss'],
 })
 export class HistorialAsistenciasComponent implements OnInit {
-  @Input() asistencias: any[] = [];
   @Input() usuarioId: string = '';
+  asistenciasPorAsignatura: any[] = [];
 
   constructor(
     private asistenciaService: AsistenciaService,
@@ -19,11 +19,24 @@ export class HistorialAsistenciasComponent implements OnInit {
   async ngOnInit() {
     // Obtener el historial de asistencias del servicio
     if (this.usuarioId) {
-      this.asistenciaService.obtenerAsistencias(this.usuarioId).then(asistencias => {
-        this.asistencias = asistencias;
-      });
+      const asistencias = await this.asistenciaService.obtenerAsistencias(this.usuarioId);
+
+      // Agrupar asistencias por asignatura
+      const grupos = asistencias.reduce((acc: any, asistencia: any) => {
+        const { claseId } = asistencia;
+        if (!acc[claseId]) {
+          acc[claseId] = [];
+        }
+        acc[claseId].push(asistencia);
+        return acc;
+      }, {});
+      this.asistenciasPorAsignatura = Object.keys(grupos).map((asignatura) => ({
+        asignatura,
+        asistencias: grupos[asignatura],
+      }));
     }
   }  
+
   // Cerrar el modal
   close() {
     this.modalController.dismiss();

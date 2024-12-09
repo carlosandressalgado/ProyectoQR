@@ -14,6 +14,15 @@ export class AsistenciaService {
 
     // Obtener las asistencias actuales
     let asistencias = await this.storage.get(`asistencias_${usuarioId}`) || [];
+
+    const asistenciaExistente = asistencias.find(
+      (asistencia: any) => asistencia.claseId === claseId && asistencia.fechaQR === fechaQR
+    );
+
+    if (asistenciaExistente) {
+      throw new Error('Ya existe una asistencia registrada para esta asignatura en la fecha indicada.');
+    }
+
     asistencias.push(asistencia);
 
     // Guardar la lista actualizada de asistencias
@@ -26,3 +35,4 @@ export class AsistenciaService {
     return await this.storage.get(`asistencias_${usuarioId}`) || [];
   }
 }
+
