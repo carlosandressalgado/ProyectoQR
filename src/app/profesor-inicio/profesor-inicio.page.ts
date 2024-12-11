@@ -74,7 +74,7 @@ if (currentUser) {
             await loading.present();
 
             try {
-              const fechaActual = new Date().toLocaleDateString('es-CL', {
+              const fechaActual = new Date().toLocaleDateString('en-CA', {
               year: 'numeric',
               month: '2-digit',
               day: '2-digit'
